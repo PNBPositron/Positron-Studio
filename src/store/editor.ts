@@ -37,18 +37,30 @@ export type ImageElement = ElementBase & {
 
 export type AnyElement = TextElement | ShapeElement | ImageElement;
 
-export const CANVAS_W = 1080;
-export const CANVAS_H = 1080;
+export const DEFAULT_W = 1080;
+export const DEFAULT_H = 1080;
 
-type Tool = "templates" | "text" | "shapes" | "photos" | "uploads" | "color";
+export const CANVAS_PRESETS = [
+  { name: "Square", w: 1080, h: 1080 },
+  { name: "Story", w: 1080, h: 1920 },
+  { name: "Post 4:5", w: 1080, h: 1350 },
+  { name: "Landscape", w: 1920, h: 1080 },
+  { name: "A4", w: 1240, h: 1754 },
+  { name: "Slide 16:9", w: 1920, h: 1080 },
+] as const;
+
+type Tool = "templates" | "text" | "shapes" | "uploads" | "color" | "size";
 
 type State = {
   elements: AnyElement[];
   selectedId: string | null;
   tool: Tool;
   bgColor: string;
+  canvasW: number;
+  canvasH: number;
   history: AnyElement[][];
   future: AnyElement[][];
+  presenting: boolean;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
   add: (el: AnyElement) => void;
@@ -58,6 +70,8 @@ type State = {
   bringForward: (id: string) => void;
   sendBackward: (id: string) => void;
   setBg: (c: string) => void;
+  setCanvasSize: (w: number, h: number) => void;
+  setPresenting: (v: boolean) => void;
   undo: () => void;
   redo: () => void;
   clear: () => void;
@@ -126,9 +140,14 @@ export const useEditor = create<State>((set, get) => {
     selectedId: null,
     tool: "templates",
     bgColor: "#fafaf2",
+    canvasW: DEFAULT_W,
+    canvasH: DEFAULT_H,
     history: [],
     future: [],
+    presenting: false,
     setTool: (tool) => set({ tool }),
+    setCanvasSize: (canvasW, canvasH) => set({ canvasW, canvasH }),
+    setPresenting: (presenting) => set({ presenting }),
     select: (selectedId) => set({ selectedId }),
     add: (el) => {
       pushHistory();
