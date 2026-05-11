@@ -39,14 +39,15 @@ export function PresentationMode() {
   if (!presenting) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-ink">
-      <div className="flex items-center justify-between border-b-[3px] border-yellow bg-ink px-5 py-3">
-        <div className="font-display text-sm uppercase tracking-widest text-yellow">
-          ▶ Presenting · {canvasW}×{canvasH}
+    <div className="fixed inset-0 z-50 flex flex-col bg-ink scanlines">
+      <div className="relative flex items-center justify-between border-b border-teal/40 bg-ink px-5 py-3">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent" />
+        <div className="font-display text-sm uppercase tracking-[0.25em] text-teal text-glow">
+          ▶ presenting · <span className="font-mono text-xs text-teal/70">{canvasW}×{canvasH}</span>
         </div>
         <button
           onClick={() => setPresenting(false)}
-          className="brutal-border-2 brutal-press flex items-center gap-2 bg-yellow px-3 py-1.5 font-display text-xs uppercase tracking-wider text-ink"
+          className="brutal-border brutal-press flex items-center gap-2 bg-blue px-3 py-1.5 font-display text-xs uppercase tracking-[0.2em] text-ink"
         >
           <X className="h-4 w-4" strokeWidth={3} />
           Exit · Esc
@@ -58,7 +59,7 @@ export function PresentationMode() {
           className="brutal-shadow-lg relative shrink-0"
         >
           <div
-            className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink pointer-events-none"
+            className="absolute left-0 top-0 overflow-hidden border border-teal pointer-events-none"
             style={{
               width: canvasW,
               height: canvasH,

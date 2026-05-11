@@ -2,9 +2,9 @@ import { useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 
 const BG_COLORS = [
-  "#fafaf2", "#ffffff", "#0a0f1f", "#ffd84a", "#f5b800",
-  "#5fd4d6", "#1aa3a6", "#4d7cff", "#1f3fb8", "#ffe9a8",
-  "#c9efef", "#dde6ff",
+  "#0a0f1f", "#101a2e", "#1a2742", "#0f3460",
+  "#7df9ff", "#00d9ff", "#0ea5e9", "#4d7cff",
+  "#1f3fb8", "#000000", "#ffffff", "#ff0080",
 ];
 
 export function ColorPanel() {
@@ -17,20 +17,22 @@ export function ColorPanel() {
           <button
             key={c}
             onClick={() => setBg(c)}
-            className={`brutal-border-2 h-14 ${bgColor === c ? "ring-2 ring-blue ring-offset-2" : ""}`}
+            className={`brutal-border-2 h-14 transition-all ${
+              bgColor === c ? "border-teal scale-105 glow-teal" : "hover:border-teal"
+            }`}
             style={{ background: c }}
           />
         ))}
       </div>
       <div>
-        <label className="mb-1.5 block font-display text-[10px] uppercase tracking-widest">
-          Custom
+        <label className="mb-1.5 block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
+          ▸ Custom
         </label>
         <input
           type="color"
           value={bgColor}
           onChange={(e) => setBg(e.target.value)}
-          className="brutal-border-2 h-12 w-full bg-white"
+          className="brutal-border-2 h-12 w-full bg-surface"
         />
       </div>
     </div>
