@@ -54,17 +54,18 @@ export function PresentationMode() {
       </div>
       <div ref={wrapRef} className="relative flex flex-1 items-center justify-center overflow-hidden p-8">
         <div
-          style={{
-            width: canvasW,
-            height: canvasH,
-            transform: `scale(${scale})`,
-            transformOrigin: "center center",
-          }}
-          className="brutal-shadow-lg relative"
+          style={{ width: canvasW * scale, height: canvasH * scale }}
+          className="brutal-shadow-lg relative shrink-0"
         >
           <div
-            className="absolute inset-0 overflow-hidden border-[3px] border-ink pointer-events-none"
-            style={{ backgroundColor: bgColor }}
+            className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink pointer-events-none"
+            style={{
+              width: canvasW,
+              height: canvasH,
+              backgroundColor: bgColor,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+            }}
           >
             {elements.map((el) => (
               <CanvasElement key={el.id} element={el} scale={scale} />
