@@ -140,9 +140,14 @@ export const useEditor = create<State>((set, get) => {
     selectedId: null,
     tool: "templates",
     bgColor: "#fafaf2",
+    canvasW: DEFAULT_W,
+    canvasH: DEFAULT_H,
     history: [],
     future: [],
+    presenting: false,
     setTool: (tool) => set({ tool }),
+    setCanvasSize: (canvasW, canvasH) => set({ canvasW, canvasH }),
+    setPresenting: (presenting) => set({ presenting }),
     select: (selectedId) => set({ selectedId }),
     add: (el) => {
       pushHistory();
