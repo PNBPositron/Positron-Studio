@@ -30,6 +30,7 @@ function Editor() {
         </main>
         <PropertiesPanel />
       </div>
+      <PresentationMode />
     </div>
   );
 }
