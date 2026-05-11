@@ -72,8 +72,8 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 brutal-border-2 brutal-shadow-sm bg-paper px-3 py-1.5 font-mono text-xs font-bold">
-        {Math.round(scale * 100)}% · {canvasW}×{canvasH}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 brutal-border-2 bg-ink px-3 py-1.5 font-mono text-[10px] tracking-wider text-teal glow-teal">
+        ◆ {Math.round(scale * 100)}% · {canvasW}×{canvasH}
       </div>
     </div>
   );
