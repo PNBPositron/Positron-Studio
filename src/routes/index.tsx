@@ -21,11 +21,20 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-paper">
+    <div className="flex h-screen flex-col overflow-hidden bg-ink">
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="relative flex-1 overflow-hidden bg-[repeating-linear-gradient(45deg,_transparent_0_18px,_rgba(10,15,31,0.04)_18px_19px)]">
+        <main className="relative flex-1 overflow-hidden bg-paper scanlines">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                "linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+              maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+            }}
+          />
           <Canvas />
         </main>
         <PropertiesPanel />
