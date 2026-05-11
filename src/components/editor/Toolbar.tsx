@@ -1,18 +1,19 @@
-import { useEditor, CANVAS_W, CANVAS_H } from "@/store/editor";
+import { useEditor } from "@/store/editor";
 import { toPng } from "html-to-image";
-import { Undo2, Redo2, Trash2, Download, Square } from "lucide-react";
+import { Undo2, Redo2, Trash2, Download, Square, Play } from "lucide-react";
 
 export function Toolbar() {
-  const { undo, redo, clear } = useEditor();
+  const { undo, redo, clear, setPresenting } = useEditor();
 
   const handleExport = async () => {
     const node = document.getElementById("canvas-export");
     if (!node) return;
+    const { canvasW, canvasH } = useEditor.getState();
     useEditor.getState().select(null);
     await new Promise((r) => setTimeout(r, 50));
     const dataUrl = await toPng(node, {
-      width: CANVAS_W,
-      height: CANVAS_H,
+      width: canvasW,
+      height: canvasH,
       pixelRatio: 2,
       style: { transform: "none", left: "0", top: "0", margin: "0" },
     });
@@ -51,6 +52,13 @@ export function Toolbar() {
         <IconBtn onClick={clear} title="Clear">
           <Trash2 className="h-4 w-4" strokeWidth={3} />
         </IconBtn>
+        <button
+          onClick={() => setPresenting(true)}
+          className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-teal px-4 py-2 font-display text-sm tracking-wide text-ink"
+        >
+          <Play className="h-4 w-4 fill-ink" strokeWidth={3} />
+          PRESENT
+        </button>
         <button
           onClick={handleExport}
           className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-sm tracking-wide text-white"

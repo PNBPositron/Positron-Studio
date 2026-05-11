@@ -3,6 +3,7 @@ import { Toolbar } from "@/components/editor/Toolbar";
 import { Sidebar } from "@/components/editor/Sidebar";
 import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
+import { PresentationMode } from "@/components/editor/PresentationMode";
 
 export const Route = createFileRoute("/")({
   component: Editor,

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useEditor, CANVAS_W, CANVAS_H } from "@/store/editor";
+import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
 
 export function Canvas() {
-  const { elements, bgColor, select, selectedId, remove } = useEditor();
+  const { elements, bgColor, select, selectedId, remove, canvasW, canvasH } = useEditor();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
 
@@ -12,15 +12,15 @@ export function Canvas() {
       const el = wrapRef.current;
       if (!el) return;
       const padding = 80;
-      const sx = (el.clientWidth - padding) / CANVAS_W;
-      const sy = (el.clientHeight - padding) / CANVAS_H;
+      const sx = (el.clientWidth - padding) / canvasW;
+      const sy = (el.clientHeight - padding) / canvasH;
       setScale(Math.min(sx, sy, 1));
     };
     fit();
     const obs = new ResizeObserver(fit);
     if (wrapRef.current) obs.observe(wrapRef.current);
     return () => obs.disconnect();
-  }, []);
+  }, [canvasW, canvasH]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -51,8 +51,8 @@ export function Canvas() {
       <div
         className="brutal-shadow-lg relative"
         style={{
-          width: CANVAS_W,
-          height: CANVAS_H,
+          width: canvasW,
+          height: canvasH,
           transform: `scale(${scale})`,
           transformOrigin: "center center",
         }}
@@ -72,7 +72,7 @@ export function Canvas() {
       </div>
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 brutal-border-2 brutal-shadow-sm bg-paper px-3 py-1.5 font-mono text-xs font-bold">
-        {Math.round(scale * 100)}% · {CANVAS_W}×{CANVAS_H}
+        {Math.round(scale * 100)}% · {canvasW}×{canvasH}
       </div>
     </div>
   );

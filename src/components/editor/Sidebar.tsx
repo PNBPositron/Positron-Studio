@@ -1,19 +1,19 @@
 import { useEditor } from "@/store/editor";
-import { LayoutTemplate, Type, Shapes, Image as ImageIcon, Upload, Palette } from "lucide-react";
+import { LayoutTemplate, Type, Shapes, Upload, Palette, Maximize2 } from "lucide-react";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
 import { ShapesPanel } from "./panels/ShapesPanel";
-import { PhotosPanel } from "./panels/PhotosPanel";
 import { UploadsPanel } from "./panels/UploadsPanel";
 import { ColorPanel } from "./panels/ColorPanel";
+import { SizePanel } from "./panels/SizePanel";
 
 const TOOLS = [
   { id: "templates", label: "Templates", icon: LayoutTemplate, bg: "bg-yellow" },
   { id: "text", label: "Text", icon: Type, bg: "bg-teal" },
   { id: "shapes", label: "Shapes", icon: Shapes, bg: "bg-blue" },
-  { id: "photos", label: "Photos", icon: ImageIcon, bg: "bg-yellow" },
   { id: "uploads", label: "Uploads", icon: Upload, bg: "bg-teal" },
   { id: "color", label: "Color", icon: Palette, bg: "bg-blue" },
+  { id: "size", label: "Size", icon: Maximize2, bg: "bg-yellow" },
 ] as const;
 
 export function Sidebar() {
@@ -44,9 +44,9 @@ export function Sidebar() {
         {tool === "templates" && <TemplatesPanel />}
         {tool === "text" && <TextPanel />}
         {tool === "shapes" && <ShapesPanel />}
-        {tool === "photos" && <PhotosPanel />}
         {tool === "uploads" && <UploadsPanel />}
         {tool === "color" && <ColorPanel />}
+        {tool === "size" && <SizePanel />}
       </div>
     </aside>
   );
