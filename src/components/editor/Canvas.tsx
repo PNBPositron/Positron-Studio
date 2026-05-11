@@ -49,7 +49,7 @@ export function Canvas() {
       }}
     >
       <div
-        className="brutal-shadow-lg relative"
+        className="brutal-shadow-lg relative shrink-0"
         style={{
           width: canvasW,
           height: canvasH,
