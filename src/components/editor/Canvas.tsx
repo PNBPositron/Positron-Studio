@@ -50,20 +50,21 @@ export function Canvas() {
     >
       <div
         className="brutal-shadow-lg relative shrink-0"
-        style={{
-          width: canvasW,
-          height: canvasH,
-          transform: `scale(${scale})`,
-          transformOrigin: "center center",
-        }}
+        style={{ width: canvasW * scale, height: canvasH * scale }}
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) select(null);
         }}
       >
         <div
           id="canvas-export"
-          className="absolute inset-0 overflow-hidden border-[3px] border-ink"
-          style={{ backgroundColor: bgColor }}
+          className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink"
+          style={{
+            width: canvasW,
+            height: canvasH,
+            backgroundColor: bgColor,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
         >
           {elements.map((el) => (
             <CanvasElement key={el.id} element={el} scale={scale} />
