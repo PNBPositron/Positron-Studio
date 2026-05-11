@@ -31,89 +31,132 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --color-teal: var(--teal);
   --color-teal-deep: var(--teal-deep);
   --color-blue: var(--blue);
   --color-blue-deep: var(--blue-deep);
-  --color-yellow: var(--yellow);
-  --color-yellow-deep: var(--yellow-deep);
+  --color-yellow: var(--teal);
+  --color-yellow-deep: var(--teal-deep);
   --color-ink: var(--ink);
   --color-paper: var(--paper);
-  --font-display: "Archivo Black", "Inter", sans-serif;
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-grid: var(--grid);
+
+  --font-display: "Orbitron", "Archivo Black", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --shadow-brutal: 6px 6px 0 0 var(--ink);
-  --shadow-brutal-sm: 3px 3px 0 0 var(--ink);
-  --shadow-brutal-lg: 10px 10px 0 0 var(--ink);
+  --shadow-brutal: 0 0 0 2px var(--teal), 6px 6px 0 0 var(--blue-deep);
+  --shadow-brutal-sm: 0 0 0 1px var(--teal), 3px 3px 0 0 var(--blue-deep);
+  --shadow-brutal-lg: 0 0 0 2px var(--teal), 10px 10px 0 0 var(--blue-deep);
+  --shadow-glow-teal: 0 0 18px 0 color-mix(in oklab, var(--teal) 70%, transparent);
+  --shadow-glow-blue: 0 0 18px 0 color-mix(in oklab, var(--blue) 70%, transparent);
 }
 
 :root {
   --radius: 0px;
-  --ink: oklch(0.15 0.02 240);
-  --paper: oklch(0.97 0.01 90);
-  --teal: oklch(0.78 0.13 195);
-  --teal-deep: oklch(0.55 0.12 195);
-  --blue: oklch(0.62 0.2 255);
-  --blue-deep: oklch(0.42 0.22 260);
-  --yellow: oklch(0.92 0.18 95);
-  --yellow-deep: oklch(0.82 0.2 90);
+
+  /* Cyberpunk palette */
+  --ink: oklch(0.08 0.02 240);
+  --paper: oklch(0.12 0.03 240);
+  --surface: oklch(0.16 0.04 245);
+  --surface-2: oklch(0.21 0.05 250);
+  --grid: oklch(0.28 0.08 220);
+
+  --teal: oklch(0.86 0.16 195);
+  --teal-deep: oklch(0.62 0.16 195);
+  --blue: oklch(0.66 0.22 255);
+  --blue-deep: oklch(0.42 0.24 265);
 
   --background: var(--paper);
-  --foreground: var(--ink);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--ink);
-  --popover: oklch(1 0 0);
-  --popover-foreground: var(--ink);
+  --foreground: var(--teal);
+  --card: var(--surface);
+  --card-foreground: var(--teal);
+  --popover: var(--surface);
+  --popover-foreground: var(--teal);
   --primary: var(--blue);
-  --primary-foreground: oklch(1 0 0);
+  --primary-foreground: oklch(0.08 0.02 240);
   --secondary: var(--teal);
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.94 0.005 90);
-  --muted-foreground: oklch(0.45 0.02 240);
-  --accent: var(--yellow);
+  --muted: var(--surface-2);
+  --muted-foreground: oklch(0.62 0.07 220);
+  --accent: var(--teal);
   --accent-foreground: var(--ink);
-  --destructive: oklch(0.62 0.24 25);
+  --destructive: oklch(0.65 0.27 18);
   --destructive-foreground: oklch(1 0 0);
-  --border: var(--ink);
-  --input: var(--ink);
+  --border: var(--teal);
+  --input: var(--teal-deep);
   --ring: var(--blue);
 }
 
 @layer base {
   * {
-    border-color: var(--color-border);
+    border-color: color-mix(in oklab, var(--teal) 30%, transparent);
   }
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-family: "Inter", system-ui, sans-serif;
+  html, body {
+    background-color: var(--ink);
+    color: var(--teal);
+    font-family: "JetBrains Mono", "Inter", system-ui, monospace;
     background-image:
-      linear-gradient(var(--ink) 1px, transparent 1px),
-      linear-gradient(90deg, var(--ink) 1px, transparent 1px);
-    background-size: 32px 32px;
-    background-position: -1px -1px;
-    background-color: var(--paper);
+      linear-gradient(color-mix(in oklab, var(--teal) 12%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--blue) 12%, transparent) 1px, transparent 1px),
+      radial-gradient(ellipse at 20% 10%, color-mix(in oklab, var(--blue) 22%, transparent), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, color-mix(in oklab, var(--teal) 18%, transparent), transparent 60%);
+    background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  ::selection {
+    background: var(--teal);
+    color: var(--ink);
   }
 }
 
 @layer utilities {
-  .brutal-border { border: 3px solid var(--ink); }
-  .brutal-border-2 { border: 2px solid var(--ink); }
-  .brutal-shadow { box-shadow: 6px 6px 0 0 var(--ink); }
-  .brutal-shadow-sm { box-shadow: 3px 3px 0 0 var(--ink); }
-  .brutal-shadow-lg { box-shadow: 10px 10px 0 0 var(--ink); }
+  .brutal-border { border: 2px solid var(--teal); }
+  .brutal-border-2 { border: 1px solid color-mix(in oklab, var(--teal) 60%, transparent); }
+  .brutal-shadow { box-shadow: 0 0 0 2px var(--teal), 6px 6px 0 0 var(--blue-deep); }
+  .brutal-shadow-sm { box-shadow: 0 0 0 1px var(--teal), 3px 3px 0 0 var(--blue-deep); }
+  .brutal-shadow-lg { box-shadow: 0 0 0 2px var(--teal), 12px 12px 0 0 var(--blue-deep), var(--shadow-glow-blue); }
+  .glow-teal { box-shadow: var(--shadow-glow-teal); }
+  .glow-blue { box-shadow: var(--shadow-glow-blue); }
+  .text-glow {
+    text-shadow:
+      0 0 6px color-mix(in oklab, var(--teal) 60%, transparent),
+      0 0 18px color-mix(in oklab, var(--teal) 30%, transparent);
+  }
+  .text-glow-blue {
+    text-shadow:
+      0 0 6px color-mix(in oklab, var(--blue) 70%, transparent),
+      0 0 18px color-mix(in oklab, var(--blue) 35%, transparent);
+  }
   .brutal-press {
-    transition: transform 80ms ease, box-shadow 80ms ease;
+    transition: transform 90ms ease, box-shadow 90ms ease, filter 120ms ease;
   }
   .brutal-press:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0 0 var(--ink);
+    box-shadow: 0 0 0 2px var(--teal), 8px 8px 0 0 var(--blue-deep), var(--shadow-glow-teal);
+    filter: brightness(1.05);
   }
   .brutal-press:active {
-    transform: translate(3px, 3px);
-    box-shadow: 2px 2px 0 0 var(--ink);
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 2px var(--teal), 2px 2px 0 0 var(--blue-deep);
+  }
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      color-mix(in oklab, var(--teal) 6%, transparent) 2px,
+      color-mix(in oklab, var(--teal) 6%, transparent) 3px
+    );
+  }
+  .neon-divider {
+    background: linear-gradient(90deg, transparent, var(--teal), var(--blue), transparent);
+    height: 2px;
+    width: 100%;
   }
 }
