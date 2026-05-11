@@ -60,7 +60,7 @@ export function PresentationMode() {
             transform: `scale(${scale})`,
             transformOrigin: "center center",
           }}
-          className="brutal-shadow-lg relative"
+          className="brutal-shadow-lg relative shrink-0"
         >
           <div
             className="absolute inset-0 overflow-hidden border-[3px] border-ink pointer-events-none"
