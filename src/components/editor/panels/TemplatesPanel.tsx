@@ -3,64 +3,64 @@ import { PanelHeader } from "./TextPanel";
 
 const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: () => AnyElement[] }[] = [
   {
-    name: "Big Drop",
-    bg: "#ffd84a",
+    name: "Neural Drop",
+    bg: "#0a0f1f",
     preview: (
-      <div className="flex h-full w-full flex-col justify-between bg-yellow p-2 text-[8px]">
-        <span className="font-display text-ink">NEW</span>
-        <span className="font-display text-2xl leading-none text-ink">DROP</span>
-        <span className="text-[7px] text-ink">05/26</span>
+      <div className="flex h-full w-full flex-col justify-between bg-[#0a0f1f] p-2 text-[8px]">
+        <span className="font-display text-[#7df9ff]">NEW</span>
+        <span className="font-display text-2xl leading-none text-[#7df9ff]">DROP</span>
+        <span className="text-[7px] text-[#4d7cff]">05/26</span>
       </div>
     ),
     build: () => [
-      newText({ text: "NEW", fontSize: 96, x: 80, y: 80, width: 400, height: 110, color: "#0a0f1f" }),
-      newText({ text: "DROP", fontSize: 360, x: 60, y: 360, width: 980, height: 380, color: "#0a0f1f" }),
-      newShape("rect", { x: 80, y: 880, width: 200, height: 80, fill: "#1f3fb8", stroke: "#0a0f1f", strokeWidth: 6 }),
-      newText({ text: "05/26", fontSize: 48, x: 110, y: 900, width: 200, height: 50, color: "#ffffff", fontFamily: "Inter", fontWeight: 800 }),
+      newText({ text: "// NEW", fontSize: 96, x: 80, y: 80, width: 500, height: 110, color: "#4d7cff", fontFamily: "JetBrains Mono", fontWeight: 700 }),
+      newText({ text: "DROP", fontSize: 360, x: 60, y: 360, width: 980, height: 380, color: "#7df9ff", fontFamily: "Orbitron" }),
+      newShape("rect", { x: 80, y: 880, width: 240, height: 80, fill: "#4d7cff", stroke: "#7df9ff", strokeWidth: 4 }),
+      newText({ text: "05/26", fontSize: 48, x: 110, y: 900, width: 200, height: 50, color: "#0a0f1f", fontFamily: "JetBrains Mono", fontWeight: 700 }),
     ],
   },
   {
-    name: "Sale",
-    bg: "#5fd4d6",
+    name: "System OK",
+    bg: "#101a2e",
     preview: (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-teal p-2">
-        <span className="font-display text-2xl text-ink">SALE</span>
-        <span className="text-[8px] text-ink">-50%</span>
+      <div className="flex h-full w-full flex-col items-center justify-center bg-[#101a2e] p-2">
+        <span className="font-display text-2xl text-[#7df9ff]">OK</span>
+        <span className="text-[8px] text-[#4d7cff]">200</span>
       </div>
     ),
     build: () => [
-      newShape("circle", { x: 240, y: 240, width: 600, height: 600, fill: "#ffd84a", stroke: "#0a0f1f", strokeWidth: 10 }),
-      newText({ text: "SALE", fontSize: 220, x: 90, y: 380, width: 900, height: 240, color: "#0a0f1f", align: "center" }),
-      newText({ text: "-50%", fontSize: 100, x: 90, y: 620, width: 900, height: 120, color: "#1f3fb8", align: "center" }),
+      newShape("circle", { x: 240, y: 240, width: 600, height: 600, fill: "#0a0f1f", stroke: "#7df9ff", strokeWidth: 8 }),
+      newText({ text: "OK", fontSize: 320, x: 90, y: 360, width: 900, height: 320, color: "#7df9ff", align: "center", fontFamily: "Orbitron" }),
+      newText({ text: "STATUS_200", fontSize: 80, x: 90, y: 700, width: 900, height: 100, color: "#4d7cff", align: "center", fontFamily: "JetBrains Mono", fontWeight: 700 }),
     ],
   },
   {
-    name: "Quote",
-    bg: "#fafaf2",
+    name: "Manifesto",
+    bg: "#0a0f1f",
     preview: (
-      <div className="flex h-full w-full flex-col justify-center bg-paper p-2">
-        <span className="font-display text-[10px] leading-tight text-ink">"BUILD<br/>LOUD"</span>
+      <div className="flex h-full w-full flex-col justify-center bg-[#0a0f1f] p-2">
+        <span className="font-display text-[10px] leading-tight text-[#7df9ff]">JACK<br/>IN_</span>
       </div>
     ),
     build: () => [
-      newShape("rect", { x: 0, y: 0, width: 1080, height: 200, fill: "#1f3fb8", stroke: "#1f3fb8", strokeWidth: 0 }),
-      newText({ text: "MANIFESTO Nº 01", fontSize: 60, x: 60, y: 70, width: 900, height: 80, color: "#ffd84a", fontFamily: "Inter", fontWeight: 900 }),
-      newText({ text: '"BUILD\nLOUD"', fontSize: 320, x: 60, y: 320, width: 1000, height: 720, color: "#0a0f1f" }),
+      newShape("rect", { x: 0, y: 0, width: 1080, height: 200, fill: "#4d7cff", stroke: "#4d7cff", strokeWidth: 0 }),
+      newText({ text: "MANIFESTO_01", fontSize: 60, x: 60, y: 70, width: 900, height: 80, color: "#0a0f1f", fontFamily: "JetBrains Mono", fontWeight: 700 }),
+      newText({ text: "JACK\nIN_", fontSize: 320, x: 60, y: 320, width: 1000, height: 720, color: "#7df9ff", fontFamily: "Orbitron" }),
     ],
   },
   {
-    name: "Event",
-    bg: "#1f3fb8",
+    name: "After Hours",
+    bg: "#101a2e",
     preview: (
-      <div className="flex h-full w-full flex-col justify-end bg-blue-deep p-2">
-        <span className="font-display text-[10px] text-yellow">FRI</span>
-        <span className="font-display text-lg leading-none text-yellow">PARTY</span>
+      <div className="flex h-full w-full flex-col justify-end bg-[#101a2e] p-2">
+        <span className="font-display text-[10px] text-[#4d7cff]">FRI</span>
+        <span className="font-display text-lg leading-none text-[#7df9ff]">RAVE</span>
       </div>
     ),
     build: () => [
-      newText({ text: "FRI 26.05", fontSize: 70, x: 80, y: 100, width: 800, height: 90, color: "#ffd84a", fontFamily: "Inter", fontWeight: 900 }),
-      newText({ text: "AFTER\nHOURS", fontSize: 280, x: 60, y: 280, width: 1000, height: 600, color: "#5fd4d6" }),
-      newShape("triangle", { x: 700, y: 800, width: 280, height: 220, fill: "#ffd84a", stroke: "#ffd84a", strokeWidth: 0 }),
+      newText({ text: "FRI 26.05", fontSize: 70, x: 80, y: 100, width: 800, height: 90, color: "#4d7cff", fontFamily: "JetBrains Mono", fontWeight: 700 }),
+      newText({ text: "AFTER\nHOURS", fontSize: 280, x: 60, y: 280, width: 1000, height: 600, color: "#7df9ff", fontFamily: "Orbitron" }),
+      newShape("triangle", { x: 700, y: 800, width: 280, height: 220, fill: "#4d7cff", stroke: "#4d7cff", strokeWidth: 0 }),
     ],
   },
 ];
@@ -70,18 +70,18 @@ export function TemplatesPanel() {
   return (
     <div className="space-y-4">
       <PanelHeader title="Templates" />
-      <p className="text-xs text-muted-foreground">Tap to load. Replaces your canvas.</p>
+      <p className="font-mono text-[10px] text-teal/60">&gt; tap to load · replaces canvas</p>
       <div className="grid grid-cols-2 gap-2">
         {TEMPLATES.map((t) => (
           <button
             key={t.name}
             onClick={() => loadTemplate(t.build(), t.bg)}
-            className="brutal-border-2 brutal-press overflow-hidden bg-white text-left"
+            className="brutal-border-2 brutal-press overflow-hidden bg-surface text-left hover:border-teal"
           >
-            <div className="aspect-square w-full overflow-hidden border-b-[2px] border-ink">
+            <div className="aspect-square w-full overflow-hidden border-b border-teal/30">
               {t.preview}
             </div>
-            <div className="bg-ink px-2 py-1 font-display text-[10px] uppercase tracking-wider text-yellow">
+            <div className="bg-ink px-2 py-1 font-display text-[10px] uppercase tracking-[0.15em] text-teal">
               {t.name}
             </div>
           </button>

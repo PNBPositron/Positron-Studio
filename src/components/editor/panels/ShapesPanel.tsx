@@ -9,7 +9,7 @@ const SHAPES: { kind: ShapeKind; label: string }[] = [
   { kind: "arrow", label: "Arrow" },
 ];
 
-const FILLS = ["#ffd84a", "#5fd4d6", "#4d7cff", "#0a0f1f", "#ffffff"];
+const FILLS = ["#7df9ff", "#4d7cff", "#0a0f1f"];
 
 export function ShapesPanel() {
   const { add } = useEditor();
@@ -18,11 +18,18 @@ export function ShapesPanel() {
       <PanelHeader title="Shapes" />
       <div className="grid grid-cols-3 gap-2">
         {SHAPES.flatMap((s) =>
-          FILLS.slice(0, 3).map((fill) => (
+          FILLS.map((fill) => (
             <button
               key={s.kind + fill}
-              onClick={() => add(newShape(s.kind, { fill }))}
-              className="brutal-border-2 brutal-press grid h-20 place-items-center bg-paper"
+              onClick={() =>
+                add(
+                  newShape(s.kind, {
+                    fill,
+                    stroke: fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f",
+                  }),
+                )
+              }
+              className="brutal-border-2 brutal-press grid h-20 place-items-center bg-surface hover:border-teal"
               title={s.label}
             >
               <ShapePreview kind={s.kind} fill={fill} />
@@ -35,8 +42,8 @@ export function ShapesPanel() {
 }
 
 function ShapePreview({ kind, fill }: { kind: ShapeKind; fill: string }) {
-  const stroke = "#0a0f1f";
-  const sw = 4;
+  const stroke = fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f";
+  const sw = 3;
   if (kind === "rect")
     return (
       <svg width="44" height="44" viewBox="0 0 44 44">

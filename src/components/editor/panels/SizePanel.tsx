@@ -18,7 +18,9 @@ export function SizePanel() {
       <PanelHeader title="Canvas Size" />
 
       <div>
-        <div className="mb-2 font-display text-[10px] uppercase tracking-widest">Presets</div>
+        <div className="mb-2 font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
+          ▸ Presets
+        </div>
         <div className="grid grid-cols-2 gap-2">
           {CANVAS_PRESETS.map((p) => {
             const active = canvasW === p.w && canvasH === p.h;
@@ -35,16 +37,18 @@ export function SizePanel() {
                   setH(p.h);
                 }}
                 className={`brutal-border-2 brutal-press flex flex-col items-center gap-1 p-2 ${
-                  active ? "bg-blue text-white" : "bg-white"
+                  active
+                    ? "bg-blue-deep text-teal border-teal glow-blue"
+                    : "bg-surface text-teal/80 hover:border-teal hover:text-teal"
                 }`}
               >
                 <div className="grid h-12 w-full place-items-center">
                   <div
-                    className="border-2 border-current"
+                    className="border border-current"
                     style={{ width: tw, height: th }}
                   />
                 </div>
-                <span className="font-display text-[10px] uppercase">{p.name}</span>
+                <span className="font-display text-[10px] uppercase tracking-wider">{p.name}</span>
                 <span className="font-mono text-[9px] opacity-70">
                   {p.w}×{p.h}
                 </span>
@@ -55,32 +59,38 @@ export function SizePanel() {
       </div>
 
       <div className="space-y-2">
-        <div className="font-display text-[10px] uppercase tracking-widest">Custom</div>
+        <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
+          ▸ Custom
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
-            <span className="mb-1 block text-[10px] font-bold uppercase">Width</span>
+            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">
+              W
+            </span>
             <input
               type="number"
               value={w}
               onChange={(e) => setW(+e.target.value)}
-              className="brutal-border-2 w-full bg-white px-2 py-1.5 font-mono text-sm"
+              className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-[10px] font-bold uppercase">Height</span>
+            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">
+              H
+            </span>
             <input
               type="number"
               value={h}
               onChange={(e) => setH(+e.target.value)}
-              className="brutal-border-2 w-full bg-white px-2 py-1.5 font-mono text-sm"
+              className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
             />
           </label>
         </div>
         <button
           onClick={apply}
-          className="brutal-border-2 brutal-press w-full bg-yellow py-2 font-display text-xs uppercase tracking-wider"
+          className="brutal-border brutal-press w-full bg-blue py-2 font-display text-xs uppercase tracking-[0.2em] text-ink"
         >
-          Apply size
+          ▸ Apply size
         </button>
       </div>
     </div>
