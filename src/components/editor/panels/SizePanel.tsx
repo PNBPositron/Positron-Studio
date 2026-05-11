@@ -22,6 +22,10 @@ export function SizePanel() {
         <div className="grid grid-cols-2 gap-2">
           {CANVAS_PRESETS.map((p) => {
             const active = canvasW === p.w && canvasH === p.h;
+            const max = 44;
+            const ratio = p.w / p.h;
+            const tw = ratio >= 1 ? max : max * ratio;
+            const th = ratio >= 1 ? max / ratio : max;
             return (
               <button
                 key={p.name}
@@ -34,14 +38,12 @@ export function SizePanel() {
                   active ? "bg-blue text-white" : "bg-white"
                 }`}
               >
-                <div
-                  className="border-2 border-current"
-                  style={{
-                    width: 36,
-                    height: 36 * (p.h / p.w),
-                    maxHeight: 48,
-                  }}
-                />
+                <div className="grid h-12 w-full place-items-center">
+                  <div
+                    className="border-2 border-current"
+                    style={{ width: tw, height: th }}
+                  />
+                </div>
                 <span className="font-display text-[10px] uppercase">{p.name}</span>
                 <span className="font-mono text-[9px] opacity-70">
                   {p.w}×{p.h}
