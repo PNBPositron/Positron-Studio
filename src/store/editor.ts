@@ -37,8 +37,15 @@ export type ImageElement = ElementBase & {
 
 export type AnyElement = TextElement | ShapeElement | ImageElement;
 
+export type Page = {
+  id: string;
+  elements: AnyElement[];
+  bgColor: string;
+};
+
 export const DEFAULT_W = 1080;
 export const DEFAULT_H = 1080;
+const DEFAULT_BG = "#fafaf2";
 
 export const CANVAS_PRESETS = [
   { name: "Square", w: 1080, h: 1080 },
@@ -51,15 +58,20 @@ export const CANVAS_PRESETS = [
 
 type Tool = "templates" | "text" | "shapes" | "uploads" | "color" | "size";
 
+type HistorySnap = { pages: Page[]; currentIndex: number };
+
 type State = {
+  pages: Page[];
+  currentIndex: number;
+  // derived mirror of current page (kept in sync)
   elements: AnyElement[];
+  bgColor: string;
   selectedId: string | null;
   tool: Tool;
-  bgColor: string;
   canvasW: number;
   canvasH: number;
-  history: AnyElement[][];
-  future: AnyElement[][];
+  history: HistorySnap[];
+  future: HistorySnap[];
   presenting: boolean;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
@@ -76,6 +88,12 @@ type State = {
   redo: () => void;
   clear: () => void;
   loadTemplate: (els: AnyElement[], bg?: string) => void;
+  // pages
+  addPage: () => void;
+  removePage: (index: number) => void;
+  duplicatePage: (index: number) => void;
+  setCurrentPage: (index: number) => void;
+  movePage: (from: number, to: number) => void;
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -127,97 +145,170 @@ export const newImage = (src: string, overrides: Partial<ImageElement> = {}): Im
   ...overrides,
 });
 
+const newPage = (overrides: Partial<Page> = {}): Page => ({
+  id: uid(),
+  elements: [],
+  bgColor: DEFAULT_BG,
+  ...overrides,
+});
+
+const initialPage = newPage();
+
 export const useEditor = create<State>((set, get) => {
+  const snap = (): HistorySnap => ({
+    pages: JSON.parse(JSON.stringify(get().pages)),
+    currentIndex: get().currentIndex,
+  });
   const pushHistory = () => {
-    const { elements, history } = get();
-    set({
-      history: [...history, JSON.parse(JSON.stringify(elements))].slice(-50),
-      future: [],
-    });
+    set({ history: [...get().history, snap()].slice(-50), future: [] });
   };
+  const syncCurrent = (pages: Page[], currentIndex: number) => {
+    const p = pages[currentIndex];
+    return { pages, currentIndex, elements: p.elements, bgColor: p.bgColor };
+  };
+  const updateCurrentPage = (mut: (p: Page) => Page) => {
+    const { pages, currentIndex } = get();
+    const next = pages.map((p, i) => (i === currentIndex ? mut(p) : p));
+    set(syncCurrent(next, currentIndex));
+  };
+
   return {
-    elements: [],
+    pages: [initialPage],
+    currentIndex: 0,
+    elements: initialPage.elements,
+    bgColor: initialPage.bgColor,
     selectedId: null,
     tool: "templates",
-    bgColor: "#fafaf2",
     canvasW: DEFAULT_W,
     canvasH: DEFAULT_H,
     history: [],
     future: [],
     presenting: false,
+
     setTool: (tool) => set({ tool }),
     setCanvasSize: (canvasW, canvasH) => set({ canvasW, canvasH }),
     setPresenting: (presenting) => set({ presenting }),
     select: (selectedId) => set({ selectedId }),
+
     add: (el) => {
       pushHistory();
-      set({ elements: [...get().elements, el], selectedId: el.id });
+      updateCurrentPage((p) => ({ ...p, elements: [...p.elements, el] }));
+      set({ selectedId: el.id });
     },
     update: (id, patch) =>
-      set({
-        elements: get().elements.map((e) =>
-          e.id === id ? ({ ...e, ...patch } as AnyElement) : e,
-        ),
-      }),
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) => (e.id === id ? ({ ...e, ...patch } as AnyElement) : e)),
+      })),
     remove: (id) => {
       pushHistory();
-      set({
-        elements: get().elements.filter((e) => e.id !== id),
-        selectedId: get().selectedId === id ? null : get().selectedId,
-      });
+      updateCurrentPage((p) => ({ ...p, elements: p.elements.filter((e) => e.id !== id) }));
+      if (get().selectedId === id) set({ selectedId: null });
     },
     duplicate: (id) => {
       const el = get().elements.find((e) => e.id === id);
       if (!el) return;
       pushHistory();
       const clone = { ...el, id: uid(), x: el.x + 30, y: el.y + 30 } as AnyElement;
-      set({ elements: [...get().elements, clone], selectedId: clone.id });
+      updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
+      set({ selectedId: clone.id });
     },
     bringForward: (id) => {
-      const arr = [...get().elements];
-      const i = arr.findIndex((e) => e.id === id);
-      if (i < 0 || i === arr.length - 1) return;
-      [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
-      set({ elements: arr });
+      updateCurrentPage((p) => {
+        const arr = [...p.elements];
+        const i = arr.findIndex((e) => e.id === id);
+        if (i < 0 || i === arr.length - 1) return p;
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+        return { ...p, elements: arr };
+      });
     },
     sendBackward: (id) => {
-      const arr = [...get().elements];
-      const i = arr.findIndex((e) => e.id === id);
-      if (i <= 0) return;
-      [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
-      set({ elements: arr });
+      updateCurrentPage((p) => {
+        const arr = [...p.elements];
+        const i = arr.findIndex((e) => e.id === id);
+        if (i <= 0) return p;
+        [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
+        return { ...p, elements: arr };
+      });
     },
     setBg: (bgColor) => {
       pushHistory();
-      set({ bgColor });
+      updateCurrentPage((p) => ({ ...p, bgColor }));
     },
     undo: () => {
-      const { history, elements, future } = get();
+      const { history, future } = get();
       if (history.length === 0) return;
       const prev = history[history.length - 1];
       set({
-        elements: prev,
+        ...syncCurrent(prev.pages, Math.min(prev.currentIndex, prev.pages.length - 1)),
         history: history.slice(0, -1),
-        future: [elements, ...future].slice(0, 50),
+        future: [snap(), ...future].slice(0, 50),
+        selectedId: null,
       });
     },
     redo: () => {
-      const { future, elements, history } = get();
+      const { future, history } = get();
       if (future.length === 0) return;
       const [next, ...rest] = future;
       set({
-        elements: next,
+        ...syncCurrent(next.pages, Math.min(next.currentIndex, next.pages.length - 1)),
         future: rest,
-        history: [...history, elements].slice(-50),
+        history: [...history, snap()].slice(-50),
+        selectedId: null,
       });
     },
     clear: () => {
       pushHistory();
-      set({ elements: [], selectedId: null });
+      updateCurrentPage((p) => ({ ...p, elements: [] }));
+      set({ selectedId: null });
     },
     loadTemplate: (els, bg) => {
       pushHistory();
-      set({ elements: els, bgColor: bg ?? get().bgColor, selectedId: null });
+      updateCurrentPage((p) => ({ ...p, elements: els, bgColor: bg ?? p.bgColor }));
+      set({ selectedId: null });
+    },
+
+    addPage: () => {
+      pushHistory();
+      const { pages, currentIndex, bgColor } = get();
+      const created = newPage({ bgColor });
+      const next = [...pages.slice(0, currentIndex + 1), created, ...pages.slice(currentIndex + 1)];
+      set({ ...syncCurrent(next, currentIndex + 1), selectedId: null });
+    },
+    removePage: (index) => {
+      const { pages, currentIndex } = get();
+      if (pages.length <= 1) return;
+      pushHistory();
+      const next = pages.filter((_, i) => i !== index);
+      const newIdx = Math.min(currentIndex > index ? currentIndex - 1 : currentIndex, next.length - 1);
+      set({ ...syncCurrent(next, newIdx), selectedId: null });
+    },
+    duplicatePage: (index) => {
+      pushHistory();
+      const { pages } = get();
+      const src = pages[index];
+      const clone: Page = {
+        id: uid(),
+        bgColor: src.bgColor,
+        elements: src.elements.map((e) => ({ ...e, id: uid() })),
+      };
+      const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
+      set({ ...syncCurrent(next, index + 1), selectedId: null });
+    },
+    setCurrentPage: (index) => {
+      const { pages } = get();
+      if (index < 0 || index >= pages.length) return;
+      set({ ...syncCurrent(pages, index), selectedId: null });
+    },
+    movePage: (from, to) => {
+      const { pages, currentIndex } = get();
+      if (from === to || from < 0 || to < 0 || from >= pages.length || to >= pages.length) return;
+      pushHistory();
+      const arr = [...pages];
+      const [m] = arr.splice(from, 1);
+      arr.splice(to, 0, m);
+      const newIdx = currentIndex === from ? to : currentIndex;
+      set(syncCurrent(arr, newIdx));
     },
   };
 });
