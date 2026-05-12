@@ -73,6 +73,9 @@ type State = {
   history: HistorySnap[];
   future: HistorySnap[];
   presenting: boolean;
+  // cloud-saved design metadata
+  designId: string | null;
+  designName: string;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
   add: (el: AnyElement) => void;
@@ -94,6 +97,11 @@ type State = {
   duplicatePage: (index: number) => void;
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
+  // cloud
+  setDesignMeta: (meta: { id: string | null; name: string }) => void;
+  setDesignName: (name: string) => void;
+  loadDesign: (input: { id: string; name: string; pages: Page[]; canvasW: number; canvasH: number }) => void;
+  newDesign: () => void;
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
