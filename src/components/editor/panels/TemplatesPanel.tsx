@@ -1,5 +1,28 @@
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Sparkles, Loader2 } from "lucide-react";
 import { useEditor, newText, newShape, type AnyElement } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
+import { generateAiTemplate, type AiElementInput } from "@/lib/ai-templates.functions";
+
+function buildFromAi(els: AiElementInput[]): AnyElement[] {
+  return els.map((e) => {
+    if (e.type === "text") {
+      return newText({
+        text: e.text,
+        x: e.x, y: e.y, width: e.width, height: e.height,
+        fontSize: e.fontSize, color: e.color,
+        fontFamily: e.fontFamily ?? "Orbitron",
+        fontWeight: e.fontWeight ?? 700,
+        align: e.align ?? "left",
+      });
+    }
+    return newShape(e.shape, {
+      x: e.x, y: e.y, width: e.width, height: e.height,
+      fill: e.fill, stroke: e.stroke, strokeWidth: e.strokeWidth,
+    });
+  });
+}
 
 const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: () => AnyElement[] }[] = [
   {
@@ -67,9 +90,53 @@ const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: ()
 
 export function TemplatesPanel() {
   const { loadTemplate } = useEditor();
+  const generate = useServerFn(generateAiTemplate);
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
+    if (!prompt.trim() || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await generate({ data: { prompt } });
+      loadTemplate(buildFromAi(res.elements), res.bg);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Generation failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <PanelHeader title="Templates" />
+
+      <div className="brutal-border-2 space-y-2 bg-surface p-3">
+        <div className="flex items-center gap-2 font-display text-[11px] tracking-[0.2em] text-teal">
+          <Sparkles className="h-3.5 w-3.5" /> AI_GENERATOR
+        </div>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="e.g. cyberpunk poster for a midnight rave"
+          rows={3}
+          className="w-full resize-none border border-teal/40 bg-ink p-2 font-mono text-[11px] text-teal placeholder:text-teal/30 focus:border-teal focus:outline-none"
+        />
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !prompt.trim()}
+          className="brutal-border brutal-press flex w-full items-center justify-center gap-2 bg-blue px-3 py-2 font-display text-[11px] tracking-[0.2em] text-ink disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          {loading ? "GENERATING..." : "GENERATE"}
+        </button>
+        {error && (
+          <p className="font-mono text-[10px] text-[#ff0080]">! {error}</p>
+        )}
+      </div>
+
       <p className="font-mono text-[10px] text-teal/60">&gt; tap to load · replaces canvas</p>
       <div className="grid grid-cols-2 gap-2">
         {TEMPLATES.map((t) => (
