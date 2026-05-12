@@ -73,6 +73,9 @@ type State = {
   history: HistorySnap[];
   future: HistorySnap[];
   presenting: boolean;
+  // cloud-saved design metadata
+  designId: string | null;
+  designName: string;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
   add: (el: AnyElement) => void;
@@ -94,6 +97,11 @@ type State = {
   duplicatePage: (index: number) => void;
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
+  // cloud
+  setDesignMeta: (meta: { id: string | null; name: string }) => void;
+  setDesignName: (name: string) => void;
+  loadDesign: (input: { id: string; name: string; pages: Page[]; canvasW: number; canvasH: number }) => void;
+  newDesign: () => void;
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -184,6 +192,8 @@ export const useEditor = create<State>((set, get) => {
     history: [],
     future: [],
     presenting: false,
+    designId: null,
+    designName: "untitled.design",
 
     setTool: (tool) => set({ tool }),
     setCanvasSize: (canvasW, canvasH) => set({ canvasW, canvasH }),
@@ -309,6 +319,35 @@ export const useEditor = create<State>((set, get) => {
       arr.splice(to, 0, m);
       const newIdx = currentIndex === from ? to : currentIndex;
       set(syncCurrent(arr, newIdx));
+    },
+
+    setDesignMeta: ({ id, name }) => set({ designId: id, designName: name }),
+    setDesignName: (designName) => set({ designName }),
+    loadDesign: ({ id, name, pages, canvasW, canvasH }) => {
+      const safePages = pages.length > 0 ? pages : [newPage()];
+      set({
+        ...syncCurrent(safePages, 0),
+        canvasW,
+        canvasH,
+        designId: id,
+        designName: name,
+        history: [],
+        future: [],
+        selectedId: null,
+      });
+    },
+    newDesign: () => {
+      const fresh = newPage();
+      set({
+        ...syncCurrent([fresh], 0),
+        canvasW: DEFAULT_W,
+        canvasH: DEFAULT_H,
+        designId: null,
+        designName: "untitled.design",
+        history: [],
+        future: [],
+        selectedId: null,
+      });
     },
   };
 });
