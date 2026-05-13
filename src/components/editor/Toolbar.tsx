@@ -26,7 +26,7 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx">(null);
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx" | "mp4">(null);
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -38,14 +38,20 @@ export function Toolbar() {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const runExport = async (kind: "png" | "pdf" | "pptx") => {
+  const runExport = async (kind: "png" | "pdf" | "pptx" | "mp4") => {
     setExportOpen(false);
     setExporting(kind);
     try {
       const n = designName || "positron";
       if (kind === "png") await exportPNG(n);
       else if (kind === "pdf") await exportPDF(n);
-      else await exportPPTX(n);
+      else if (kind === "pptx") await exportPPTX(n);
+      else {
+        const { ext } = await exportVideo(n);
+        if (ext === "webm") {
+          alert("Your browser couldn't encode MP4 directly — saved as .webm (same content). Use Chrome/Edge for native .mp4.");
+        }
+      }
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Export failed");
