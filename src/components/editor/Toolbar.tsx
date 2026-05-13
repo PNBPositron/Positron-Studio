@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useEditor } from "@/store/editor";
-import { toPng } from "html-to-image";
 import {
   Undo2, Redo2, Trash2, Download, Play, Zap, Save, Cloud,
-  FolderOpen, LogOut, FilePlus, Loader2, User as UserIcon,
+  FolderOpen, LogOut, FilePlus, Loader2, User as UserIcon, ChevronDown,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign } from "@/lib/designs";
 import { MyDesignsDialog } from "./MyDesignsDialog";
+import { exportPNG, exportPDF, exportPPTX } from "@/lib/export";
 
 export function Toolbar() {
   const {
