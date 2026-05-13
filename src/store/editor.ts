@@ -336,7 +336,8 @@ export const useEditor = create<State>((set, get) => {
     setDesignMeta: ({ id, name }) => set({ designId: id, designName: name }),
     setDesignName: (designName) => set({ designName }),
     loadDesign: ({ id, name, pages, canvasW, canvasH }) => {
-      const safePages = pages.length > 0 ? pages : [newPage()];
+      const normalized = pages.map((p) => ({ ...p, duration: p.duration ?? DEFAULT_PAGE_DURATION }));
+      const safePages = normalized.length > 0 ? normalized : [newPage()];
       set({
         ...syncCurrent(safePages, 0),
         canvasW,
