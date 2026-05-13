@@ -41,11 +41,13 @@ export type Page = {
   id: string;
   elements: AnyElement[];
   bgColor: string;
+  duration: number; // seconds
 };
 
 export const DEFAULT_W = 1920;
 export const DEFAULT_H = 1080;
 const DEFAULT_BG = "#fafaf2";
+export const DEFAULT_PAGE_DURATION = 3;
 
 export const CANVAS_PRESETS = [
   { name: "Square", w: 1080, h: 1080 },
@@ -97,6 +99,7 @@ type State = {
   duplicatePage: (index: number) => void;
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
+  setPageDuration: (index: number, seconds: number) => void;
   // cloud
   setDesignMeta: (meta: { id: string | null; name: string }) => void;
   setDesignName: (name: string) => void;
@@ -157,6 +160,7 @@ const newPage = (overrides: Partial<Page> = {}): Page => ({
   id: uid(),
   elements: [],
   bgColor: DEFAULT_BG,
+  duration: DEFAULT_PAGE_DURATION,
   ...overrides,
 });
 
@@ -300,6 +304,7 @@ export const useEditor = create<State>((set, get) => {
       const clone: Page = {
         id: uid(),
         bgColor: src.bgColor,
+        duration: src.duration,
         elements: src.elements.map((e) => ({ ...e, id: uid() })),
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
@@ -320,11 +325,19 @@ export const useEditor = create<State>((set, get) => {
       const newIdx = currentIndex === from ? to : currentIndex;
       set(syncCurrent(arr, newIdx));
     },
+    setPageDuration: (index, seconds) => {
+      const { pages, currentIndex } = get();
+      if (index < 0 || index >= pages.length) return;
+      const d = Math.max(0.2, Math.min(60, seconds));
+      const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
+      set(syncCurrent(next, currentIndex));
+    },
 
     setDesignMeta: ({ id, name }) => set({ designId: id, designName: name }),
     setDesignName: (designName) => set({ designName }),
     loadDesign: ({ id, name, pages, canvasW, canvasH }) => {
-      const safePages = pages.length > 0 ? pages : [newPage()];
+      const normalized = pages.map((p) => ({ ...p, duration: p.duration ?? DEFAULT_PAGE_DURATION }));
+      const safePages = normalized.length > 0 ? normalized : [newPage()];
       set({
         ...syncCurrent(safePages, 0),
         canvasW,

@@ -8,7 +8,7 @@ import {
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign } from "@/lib/designs";
 import { MyDesignsDialog } from "./MyDesignsDialog";
-import { exportPNG, exportPDF, exportPPTX } from "@/lib/export";
+import { exportPNG, exportPDF, exportPPTX, exportVideo } from "@/lib/export";
 
 export function Toolbar() {
   const {
@@ -26,7 +26,7 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx">(null);
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx" | "mp4">(null);
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -38,14 +38,20 @@ export function Toolbar() {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const runExport = async (kind: "png" | "pdf" | "pptx") => {
+  const runExport = async (kind: "png" | "pdf" | "pptx" | "mp4") => {
     setExportOpen(false);
     setExporting(kind);
     try {
       const n = designName || "positron";
       if (kind === "png") await exportPNG(n);
       else if (kind === "pdf") await exportPDF(n);
-      else await exportPPTX(n);
+      else if (kind === "pptx") await exportPPTX(n);
+      else {
+        const { ext } = await exportVideo(n);
+        if (ext === "webm") {
+          alert("Your browser couldn't encode MP4 directly — saved as .webm (same content). Use Chrome/Edge for native .mp4.");
+        }
+      }
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Export failed");
@@ -168,8 +174,8 @@ export function Toolbar() {
             <ChevronDown className="h-3 w-3" strokeWidth={3} />
           </button>
           {exportOpen && (
-            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-44 bg-ink p-1">
-              {(["png", "pdf", "pptx"] as const).map((k) => (
+            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-52 bg-ink p-1">
+              {(["png", "pdf", "pptx", "mp4"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -177,7 +183,7 @@ export function Toolbar() {
                 >
                   <span>EXPORT .{k.toUpperCase()}</span>
                   <span className="font-mono text-[9px] text-teal/60">
-                    {k === "png" ? "current" : "all pages"}
+                    {k === "png" ? "current" : k === "mp4" ? "video" : "all pages"}
                   </span>
                 </button>
               ))}

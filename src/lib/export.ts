@@ -75,3 +75,123 @@ export async function exportPPTX(name: string) {
   });
   await pptx.writeFile({ fileName: `${name || "positron"}-${Date.now()}.pptx` });
 }
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function pickMimeType(): { mime: string; ext: "mp4" | "webm" } {
+  const mp4Candidates = [
+    'video/mp4;codecs=avc1.42E01E',
+    'video/mp4;codecs=h264',
+    'video/mp4',
+  ];
+  for (const m of mp4Candidates) {
+    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)) {
+      return { mime: m, ext: "mp4" };
+    }
+  }
+  const webm = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+  ];
+  for (const m of webm) {
+    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)) {
+      return { mime: m, ext: "webm" };
+    }
+  }
+  return { mime: 'video/webm', ext: "webm" };
+}
+
+export async function exportVideo(
+  name: string,
+  onProgress?: (msg: string) => void,
+): Promise<{ ext: "mp4" | "webm" }> {
+  const state = useEditor.getState();
+  const { pages, canvasW, canvasH } = state;
+  if (pages.length === 0) throw new Error("No pages");
+
+  onProgress?.("rendering pages…");
+  const shots = await captureAllPages();
+  if (shots.length === 0) throw new Error("Capture failed");
+
+  onProgress?.("loading frames…");
+  const images = await Promise.all(shots.map(loadImage));
+
+  // Cap output dimensions for performance / encoder limits
+  const MAX = 1920;
+  const scale = Math.min(1, MAX / Math.max(canvasW, canvasH));
+  const W = Math.round(canvasW * scale);
+  const H = Math.round(canvasH * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D unavailable");
+
+  const fps = 30;
+  const stream = canvas.captureStream(fps);
+  const { mime, ext } = pickMimeType();
+
+  const recorder = new MediaRecorder(stream, {
+    mimeType: mime,
+    videoBitsPerSecond: 6_000_000,
+  });
+  const chunks: Blob[] = [];
+  recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+  const done = new Promise<Blob>((resolve) => {
+    recorder.onstop = () => resolve(new Blob(chunks, { type: mime }));
+  });
+
+  recorder.start();
+  // initial frame
+  ctx.fillStyle = pages[0].bgColor;
+  ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(images[0], 0, 0, W, H);
+
+  onProgress?.("recording…");
+  const startedAt = performance.now();
+  let pageIdx = 0;
+  let pageStart = startedAt;
+
+  // animation loop drawing frames in real time
+  await new Promise<void>((resolve) => {
+    const tick = () => {
+      const now = performance.now();
+      const pageElapsed = (now - pageStart) / 1000;
+      if (pageElapsed >= pages[pageIdx].duration) {
+        pageIdx += 1;
+        pageStart = now;
+        if (pageIdx >= pages.length) { resolve(); return; }
+      }
+      ctx.fillStyle = pages[pageIdx].bgColor;
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(images[pageIdx], 0, 0, W, H);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  // ensure final frame is captured
+  await new Promise((r) => setTimeout(r, 200));
+  recorder.stop();
+  const blob = await done;
+
+  onProgress?.("saving…");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${name || "positron"}-${Date.now()}.${ext}`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  return { ext };
+}
