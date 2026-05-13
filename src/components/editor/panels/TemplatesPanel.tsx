@@ -109,7 +109,7 @@ const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: ()
 ];
 
 export function TemplatesPanel() {
-  const { loadTemplate } = useEditor();
+  const { loadTemplate, canvasW, canvasH } = useEditor();
   const generate = useServerFn(generateAiTemplate);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -120,8 +120,8 @@ export function TemplatesPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await generate({ data: { prompt } });
-      loadTemplate(buildFromAi(res.elements), res.bg);
+      const res = await generate({ data: { prompt, width: canvasW, height: canvasH } });
+      loadTemplate(buildFromAi(res.elements, canvasW, canvasH), res.bg);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed");
     } finally {
