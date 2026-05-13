@@ -153,13 +153,37 @@ export function Toolbar() {
           <Play className="h-3.5 w-3.5 fill-teal" strokeWidth={3} />
           PRESENT
         </button>
-        <button
-          onClick={handleExport}
-          className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink"
-        >
-          <Download className="h-3.5 w-3.5" strokeWidth={3} />
-          EXPORT
-        </button>
+        <div className="relative" ref={exportRef}>
+          <button
+            onClick={() => setExportOpen((v) => !v)}
+            disabled={!!exporting}
+            className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink disabled:opacity-60"
+          >
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={3} />
+            ) : (
+              <Download className="h-3.5 w-3.5" strokeWidth={3} />
+            )}
+            {exporting ? exporting.toUpperCase() : "EXPORT"}
+            <ChevronDown className="h-3 w-3" strokeWidth={3} />
+          </button>
+          {exportOpen && (
+            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-44 bg-ink p-1">
+              {(["png", "pdf", "pptx"] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => runExport(k)}
+                  className="flex w-full items-center justify-between px-3 py-2 font-display text-[11px] tracking-[0.2em] text-teal hover:bg-surface"
+                >
+                  <span>EXPORT .{k.toUpperCase()}</span>
+                  <span className="font-mono text-[9px] text-teal/60">
+                    {k === "png" ? "current" : "all pages"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {open && <MyDesignsDialog onClose={() => setOpen(false)} />}
