@@ -26,22 +26,32 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const handleExport = async () => {
-    const node = document.getElementById("canvas-export");
-    if (!node) return;
-    const { canvasW, canvasH } = useEditor.getState();
-    useEditor.getState().select(null);
-    await new Promise((r) => setTimeout(r, 50));
-    const dataUrl = await toPng(node, {
-      width: canvasW,
-      height: canvasH,
-      pixelRatio: 2,
-      style: { transform: "none", left: "0", top: "0", margin: "0" },
-    });
-    const link = document.createElement("a");
-    link.download = `${designName || "bruto"}-${Date.now()}.png`;
-    link.href = dataUrl;
-    link.click();
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx">(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) setExportOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  const runExport = async (kind: "png" | "pdf" | "pptx") => {
+    setExportOpen(false);
+    setExporting(kind);
+    try {
+      const n = designName || "positron";
+      if (kind === "png") await exportPNG(n);
+      else if (kind === "pdf") await exportPDF(n);
+      else await exportPPTX(n);
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleSave = async () => {
