@@ -5,8 +5,26 @@ import { useEditor, newText, newShape, type AnyElement } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { generateAiTemplate, type AiElementInput } from "@/lib/ai-templates.functions";
 
-function buildFromAi(els: AiElementInput[]): AnyElement[] {
-  return els.map((e) => {
+const BASE = 1080;
+
+// Scale + center elements designed on a BASE×BASE square to fit any canvas.
+function fitToCanvas(els: AnyElement[], W: number, H: number): AnyElement[] {
+  const s = Math.min(W / BASE, H / BASE);
+  const offX = (W - BASE * s) / 2;
+  const offY = (H - BASE * s) / 2;
+  return els.map((e) => ({
+    ...e,
+    x: e.x * s + offX,
+    y: e.y * s + offY,
+    width: e.width * s,
+    height: e.height * s,
+    ...(e.type === "text" ? { fontSize: (e as { fontSize: number }).fontSize * s } : {}),
+    ...(e.type === "shape" ? { strokeWidth: (e as { strokeWidth: number }).strokeWidth * s } : {}),
+  }) as AnyElement);
+}
+
+function buildFromAi(els: AiElementInput[], W: number, H: number): AnyElement[] {
+  const built: AnyElement[] = els.map((e) => {
     if (e.type === "text") {
       return newText({
         text: e.text,
@@ -22,6 +40,8 @@ function buildFromAi(els: AiElementInput[]): AnyElement[] {
       fill: e.fill, stroke: e.stroke, strokeWidth: e.strokeWidth,
     });
   });
+  // AI is told the actual canvas size, so coordinates are already in W×H — no rescale.
+  return built.length && (W !== BASE || H !== BASE) ? built : built;
 }
 
 const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: () => AnyElement[] }[] = [
@@ -89,7 +109,7 @@ const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: ()
 ];
 
 export function TemplatesPanel() {
-  const { loadTemplate } = useEditor();
+  const { loadTemplate, canvasW, canvasH } = useEditor();
   const generate = useServerFn(generateAiTemplate);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -100,8 +120,8 @@ export function TemplatesPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await generate({ data: { prompt } });
-      loadTemplate(buildFromAi(res.elements), res.bg);
+      const res = await generate({ data: { prompt, width: canvasW, height: canvasH } });
+      loadTemplate(buildFromAi(res.elements, canvasW, canvasH), res.bg);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed");
     } finally {
@@ -142,7 +162,7 @@ export function TemplatesPanel() {
         {TEMPLATES.map((t) => (
           <button
             key={t.name}
-            onClick={() => loadTemplate(t.build(), t.bg)}
+            onClick={() => loadTemplate(fitToCanvas(t.build(), canvasW, canvasH), t.bg)}
             className="brutal-border-2 brutal-press overflow-hidden bg-surface text-left hover:border-teal"
           >
             <div className="aspect-square w-full overflow-hidden border-b border-teal/30">

@@ -31,11 +31,12 @@ export type AiTemplate = {
   elements: AiElementInput[];
 };
 
-const SYSTEM = `You are a graphic designer generating layouts for a 1080x1080 px canvas in a CYBERPUNK / NEOBRUTALIST style.
+const buildSystem = (W: number, H: number) => `You are a graphic designer generating layouts for a ${W}x${H} px canvas in a CYBERPUNK / NEOBRUTALIST style.
+Aspect ratio: ${(W / H).toFixed(3)} (${W >= H ? "landscape/wide" : "portrait/tall"}). Compose deliberately for this shape — fill the full ${W}px width and ${H}px height, do not letterbox.
 Palette: deep ink #0a0f1f, surfaces #101a2e, neon teal #7df9ff, electric blue #4d7cff, hot magenta #ff0080, white #ffffff.
 Use bold typography, dramatic scale contrast, generous negative space, geometric shapes.
 Fonts available: "Orbitron" (display), "JetBrains Mono" (mono/labels), "Archivo Black" (heavy headlines).
-Coordinates are absolute pixels within 1080x1080. Keep all elements inside bounds.
+Coordinates are absolute pixels within ${W}x${H}. Keep all elements inside bounds (0 ≤ x, x+width ≤ ${W}; 0 ≤ y, y+height ≤ ${H}).
 Return ONLY valid JSON matching this TypeScript shape, no markdown, no commentary:
 {
   "bg": "#hex",
@@ -44,14 +45,22 @@ Return ONLY valid JSON matching this TypeScript shape, no markdown, no commentar
     | { "type": "shape", "shape": "rect"|"circle"|"triangle"|"star"|"arrow", "x": number, "y": number, "width": number, "height": number, "fill": "#hex", "stroke": "#hex", "strokeWidth": number }
   >
 }
-Aim for 4-8 elements. Make it visually striking.`;
+Aim for 4-8 elements. Make it visually striking and tailored to the ${W >= H ? "wide" : "tall"} format.`;
 
 export const generateAiTemplate = createServerFn({ method: "POST" })
-  .inputValidator((data: { prompt: string }) => {
+  .inputValidator((data: { prompt: string; width?: number; height?: number }) => {
     if (!data || typeof data.prompt !== "string" || !data.prompt.trim()) {
       throw new Error("Prompt is required");
     }
-    return { prompt: data.prompt.slice(0, 500) };
+    const clamp = (n: unknown, def: number) => {
+      const v = typeof n === "number" && Number.isFinite(n) ? Math.round(n) : def;
+      return Math.max(320, Math.min(4096, v));
+    };
+    return {
+      prompt: data.prompt.slice(0, 500),
+      width: clamp(data.width, 1920),
+      height: clamp(data.height, 1080),
+    };
   })
   .handler(async ({ data }): Promise<AiTemplate> => {
     const key = process.env.LOVABLE_API_KEY;
@@ -66,7 +75,7 @@ export const generateAiTemplate = createServerFn({ method: "POST" })
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: SYSTEM },
+          { role: "system", content: buildSystem(data.width, data.height) },
           { role: "user", content: `Design concept: ${data.prompt}` },
         ],
         response_format: { type: "json_object" },
