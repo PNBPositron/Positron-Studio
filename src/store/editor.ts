@@ -159,6 +159,7 @@ const newPage = (overrides: Partial<Page> = {}): Page => ({
   id: uid(),
   elements: [],
   bgColor: DEFAULT_BG,
+  duration: DEFAULT_PAGE_DURATION,
   ...overrides,
 });
 
