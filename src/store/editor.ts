@@ -41,11 +41,13 @@ export type Page = {
   id: string;
   elements: AnyElement[];
   bgColor: string;
+  duration: number; // seconds
 };
 
 export const DEFAULT_W = 1920;
 export const DEFAULT_H = 1080;
 const DEFAULT_BG = "#fafaf2";
+export const DEFAULT_PAGE_DURATION = 3;
 
 export const CANVAS_PRESETS = [
   { name: "Square", w: 1080, h: 1080 },
