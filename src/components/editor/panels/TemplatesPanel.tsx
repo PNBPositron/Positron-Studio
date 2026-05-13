@@ -5,8 +5,26 @@ import { useEditor, newText, newShape, type AnyElement } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { generateAiTemplate, type AiElementInput } from "@/lib/ai-templates.functions";
 
-function buildFromAi(els: AiElementInput[]): AnyElement[] {
-  return els.map((e) => {
+const BASE = 1080;
+
+// Scale + center elements designed on a BASE×BASE square to fit any canvas.
+function fitToCanvas(els: AnyElement[], W: number, H: number): AnyElement[] {
+  const s = Math.min(W / BASE, H / BASE);
+  const offX = (W - BASE * s) / 2;
+  const offY = (H - BASE * s) / 2;
+  return els.map((e) => ({
+    ...e,
+    x: e.x * s + offX,
+    y: e.y * s + offY,
+    width: e.width * s,
+    height: e.height * s,
+    ...(e.type === "text" ? { fontSize: (e as { fontSize: number }).fontSize * s } : {}),
+    ...(e.type === "shape" ? { strokeWidth: (e as { strokeWidth: number }).strokeWidth * s } : {}),
+  }) as AnyElement);
+}
+
+function buildFromAi(els: AiElementInput[], W: number, H: number): AnyElement[] {
+  const built: AnyElement[] = els.map((e) => {
     if (e.type === "text") {
       return newText({
         text: e.text,
@@ -22,6 +40,8 @@ function buildFromAi(els: AiElementInput[]): AnyElement[] {
       fill: e.fill, stroke: e.stroke, strokeWidth: e.strokeWidth,
     });
   });
+  // AI is told the actual canvas size, so coordinates are already in W×H — no rescale.
+  return built.length && (W !== BASE || H !== BASE) ? built : built;
 }
 
 const TEMPLATES: { name: string; bg: string; preview: React.ReactNode; build: () => AnyElement[] }[] = [
