@@ -325,6 +325,13 @@ export const useEditor = create<State>((set, get) => {
       const newIdx = currentIndex === from ? to : currentIndex;
       set(syncCurrent(arr, newIdx));
     },
+    setPageDuration: (index, seconds) => {
+      const { pages, currentIndex } = get();
+      if (index < 0 || index >= pages.length) return;
+      const d = Math.max(0.2, Math.min(60, seconds));
+      const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
+      set(syncCurrent(next, currentIndex));
+    },
 
     setDesignMeta: ({ id, name }) => set({ designId: id, designName: name }),
     setDesignName: (designName) => set({ designName }),
