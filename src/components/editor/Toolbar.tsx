@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useEditor } from "@/store/editor";
-import { toPng } from "html-to-image";
 import {
   Undo2, Redo2, Trash2, Download, Play, Zap, Save, Cloud,
-  FolderOpen, LogOut, FilePlus, Loader2, User as UserIcon,
+  FolderOpen, LogOut, FilePlus, Loader2, User as UserIcon, ChevronDown,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign } from "@/lib/designs";
 import { MyDesignsDialog } from "./MyDesignsDialog";
+import { exportPNG, exportPDF, exportPPTX } from "@/lib/export";
 
 export function Toolbar() {
   const {
@@ -26,22 +26,32 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const handleExport = async () => {
-    const node = document.getElementById("canvas-export");
-    if (!node) return;
-    const { canvasW, canvasH } = useEditor.getState();
-    useEditor.getState().select(null);
-    await new Promise((r) => setTimeout(r, 50));
-    const dataUrl = await toPng(node, {
-      width: canvasW,
-      height: canvasH,
-      pixelRatio: 2,
-      style: { transform: "none", left: "0", top: "0", margin: "0" },
-    });
-    const link = document.createElement("a");
-    link.download = `${designName || "bruto"}-${Date.now()}.png`;
-    link.href = dataUrl;
-    link.click();
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx">(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) setExportOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  const runExport = async (kind: "png" | "pdf" | "pptx") => {
+    setExportOpen(false);
+    setExporting(kind);
+    try {
+      const n = designName || "positron";
+      if (kind === "png") await exportPNG(n);
+      else if (kind === "pdf") await exportPDF(n);
+      else await exportPPTX(n);
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleSave = async () => {
@@ -75,7 +85,7 @@ export function Toolbar() {
             <Zap className="h-5 w-5 text-teal" strokeWidth={2.5} fill="currentColor" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal text-glow">
-            BRUTO<span className="text-blue text-glow-blue">//</span>STUDIO
+            POSITRON<span className="text-blue text-glow-blue">//</span>STUDIO
           </div>
           <span className="hidden md:inline-block bg-teal/15 px-2 py-0.5 font-mono text-[10px] tracking-widest text-teal border border-teal/40">
             v2.0_NEO
@@ -143,13 +153,37 @@ export function Toolbar() {
           <Play className="h-3.5 w-3.5 fill-teal" strokeWidth={3} />
           PRESENT
         </button>
-        <button
-          onClick={handleExport}
-          className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink"
-        >
-          <Download className="h-3.5 w-3.5" strokeWidth={3} />
-          EXPORT
-        </button>
+        <div className="relative" ref={exportRef}>
+          <button
+            onClick={() => setExportOpen((v) => !v)}
+            disabled={!!exporting}
+            className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink disabled:opacity-60"
+          >
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={3} />
+            ) : (
+              <Download className="h-3.5 w-3.5" strokeWidth={3} />
+            )}
+            {exporting ? exporting.toUpperCase() : "EXPORT"}
+            <ChevronDown className="h-3 w-3" strokeWidth={3} />
+          </button>
+          {exportOpen && (
+            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-44 bg-ink p-1">
+              {(["png", "pdf", "pptx"] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => runExport(k)}
+                  className="flex w-full items-center justify-between px-3 py-2 font-display text-[11px] tracking-[0.2em] text-teal hover:bg-surface"
+                >
+                  <span>EXPORT .{k.toUpperCase()}</span>
+                  <span className="font-mono text-[9px] text-teal/60">
+                    {k === "png" ? "current" : "all pages"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {open && <MyDesignsDialog onClose={() => setOpen(false)} />}

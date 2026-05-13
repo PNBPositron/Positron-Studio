@@ -9,8 +9,8 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({
     meta: [
-      { title: "Sign in — Bruto Studio" },
-      { name: "description", content: "Sign in to Bruto Studio to save and sync your neobrutalist designs." },
+      { title: "Sign in — Positron Studio" },
+      { name: "description", content: "Sign in to Positron Studio to save and sync your neobrutalist designs." },
     ],
   }),
 });
@@ -87,7 +87,7 @@ function AuthPage() {
             <Zap className="h-5 w-5 text-teal" strokeWidth={2.5} fill="currentColor" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal text-glow">
-            BRUTO<span className="text-blue text-glow-blue">//</span>STUDIO
+            POSITRON<span className="text-blue text-glow-blue">//</span>STUDIO
           </div>
         </Link>
 
