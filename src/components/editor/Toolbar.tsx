@@ -8,7 +8,7 @@ import {
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign } from "@/lib/designs";
 import { MyDesignsDialog } from "./MyDesignsDialog";
-import { exportPNG, exportPDF, exportPPTX } from "@/lib/export";
+import { exportPNG, exportPDF, exportPPTX, exportVideo } from "@/lib/export";
 
 export function Toolbar() {
   const {
