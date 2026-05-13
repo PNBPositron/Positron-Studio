@@ -303,6 +303,7 @@ export const useEditor = create<State>((set, get) => {
       const clone: Page = {
         id: uid(),
         bgColor: src.bgColor,
+        duration: src.duration,
         elements: src.elements.map((e) => ({ ...e, id: uid() })),
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
