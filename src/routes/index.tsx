@@ -42,6 +42,7 @@ function Editor() {
         <PropertiesPanel />
       </div>
       <PagesBar />
+      <Timeline />
       <PresentationMode />
     </div>
   );
