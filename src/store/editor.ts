@@ -43,7 +43,7 @@ export type Page = {
   bgColor: string;
 };
 
-export const DEFAULT_W = 1080;
+export const DEFAULT_W = 1920;
 export const DEFAULT_H = 1080;
 const DEFAULT_BG = "#fafaf2";
 
