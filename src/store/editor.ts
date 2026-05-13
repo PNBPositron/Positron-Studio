@@ -99,6 +99,7 @@ type State = {
   duplicatePage: (index: number) => void;
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
+  setPageDuration: (index: number, seconds: number) => void;
   // cloud
   setDesignMeta: (meta: { id: string | null; name: string }) => void;
   setDesignName: (name: string) => void;
