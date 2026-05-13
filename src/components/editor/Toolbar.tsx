@@ -85,7 +85,7 @@ export function Toolbar() {
             <Zap className="h-5 w-5 text-teal" strokeWidth={2.5} fill="currentColor" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal text-glow">
-            BRUTO<span className="text-blue text-glow-blue">//</span>STUDIO
+            POSITRON<span className="text-blue text-glow-blue">//</span>STUDIO
           </div>
           <span className="hidden md:inline-block bg-teal/15 px-2 py-0.5 font-mono text-[10px] tracking-widest text-teal border border-teal/40">
             v2.0_NEO
