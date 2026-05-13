@@ -174,8 +174,8 @@ export function Toolbar() {
             <ChevronDown className="h-3 w-3" strokeWidth={3} />
           </button>
           {exportOpen && (
-            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-44 bg-ink p-1">
-              {(["png", "pdf", "pptx"] as const).map((k) => (
+            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-52 bg-ink p-1">
+              {(["png", "pdf", "pptx", "mp4"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -183,7 +183,7 @@ export function Toolbar() {
                 >
                   <span>EXPORT .{k.toUpperCase()}</span>
                   <span className="font-mono text-[9px] text-teal/60">
-                    {k === "png" ? "current" : "all pages"}
+                    {k === "png" ? "current" : k === "mp4" ? "video" : "all pages"}
                   </span>
                 </button>
               ))}
