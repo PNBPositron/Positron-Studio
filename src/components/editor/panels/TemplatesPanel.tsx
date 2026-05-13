@@ -162,7 +162,7 @@ export function TemplatesPanel() {
         {TEMPLATES.map((t) => (
           <button
             key={t.name}
-            onClick={() => loadTemplate(t.build(), t.bg)}
+            onClick={() => loadTemplate(fitToCanvas(t.build(), canvasW, canvasH), t.bg)}
             className="brutal-border-2 brutal-press overflow-hidden bg-surface text-left hover:border-teal"
           >
             <div className="aspect-square w-full overflow-hidden border-b border-teal/30">
