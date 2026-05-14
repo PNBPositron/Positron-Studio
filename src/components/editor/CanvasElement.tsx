@@ -148,9 +148,28 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
           src={element.src}
           alt=""
           draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            filter: filterCss(element.filters),
+          }}
         />
       )}
+      {element.type === "icon" && (() => {
+        const Comp =
+          (LucideIcons as unknown as Record<string, React.ComponentType<LucideIcons.LucideProps>>)[element.name] ??
+          HelpCircle;
+        return (
+          <Comp
+            color={element.color}
+            strokeWidth={element.strokeWidth}
+            style={{ width: "100%", height: "100%", display: "block" }}
+          />
+        );
+      })()}
+      {element.type === "model3d" && <Model3DRender element={element} />}
 
       {selected && !editing && (
         <>
