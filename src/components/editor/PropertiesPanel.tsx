@@ -87,6 +87,36 @@ export function PropertiesPanel() {
                 ))}
               </div>
             </Field>
+            <Field label="Style">
+              <div className="flex gap-1">
+                {([
+                  ["I", "italic", el.italic],
+                  ["U", "underline", el.underline],
+                  ["•", "bullet", el.bullet],
+                ] as const).map(([lbl, key, on]) => (
+                  <button
+                    key={key}
+                    onClick={() => update(el.id, { [key]: !on } as Partial<typeof el>)}
+                    className={`brutal-border-2 flex-1 py-1.5 font-mono text-[11px] ${
+                      on ? "bg-blue text-ink border-teal" : "bg-surface text-teal hover:border-teal"
+                    }`}
+                    style={{ fontStyle: key === "italic" ? "italic" : undefined, textDecoration: key === "underline" ? "underline" : undefined }}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Hyperlink">
+              <input
+                type="url"
+                placeholder="https://example.com"
+                value={el.href ?? ""}
+                onChange={(e) => update(el.id, { href: e.target.value })}
+                className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
+              />
+              <div className="font-mono text-[10px] text-teal/50">&gt; active in presentation/export</div>
+            </Field>
           </>
         )}
 

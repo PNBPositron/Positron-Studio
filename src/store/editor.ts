@@ -19,6 +19,8 @@ export type TextElement = ElementBase & {
   align: "left" | "center" | "right";
   italic?: boolean;
   underline?: boolean;
+  bullet?: boolean;
+  href?: string;
 };
 
 export type ShapeKind = "rect" | "circle" | "triangle" | "star" | "arrow";
