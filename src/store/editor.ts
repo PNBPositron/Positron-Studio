@@ -32,12 +32,52 @@ export type ShapeElement = ElementBase & {
   strokeWidth: number;
 };
 
+export type ImageFilters = {
+  brightness: number; // %
+  contrast: number; // %
+  saturate: number; // %
+  blur: number; // px
+  grayscale: number; // %
+  sepia: number; // %
+  hueRotate: number; // deg
+  invert: number; // %
+};
+
+export const DEFAULT_FILTERS: ImageFilters = {
+  brightness: 100,
+  contrast: 100,
+  saturate: 100,
+  blur: 0,
+  grayscale: 0,
+  sepia: 0,
+  hueRotate: 0,
+  invert: 0,
+};
+
 export type ImageElement = ElementBase & {
   type: "image";
   src: string;
+  filters?: ImageFilters;
 };
 
-export type AnyElement = TextElement | ShapeElement | ImageElement;
+export type IconElement = ElementBase & {
+  type: "icon";
+  name: string; // lucide icon name in PascalCase
+  color: string;
+  strokeWidth: number;
+};
+
+export type Model3DKind = "cube" | "pyramid" | "sphere" | "torus";
+export type Model3DElement = ElementBase & {
+  type: "model3d";
+  shape: Model3DKind;
+  color: string;
+  spinSpeed: number; // seconds per full revolution; 0 = static
+  tiltX: number; // deg
+  tiltY: number; // deg
+};
+
+export type AnyElement = TextElement | ShapeElement | ImageElement | IconElement | Model3DElement;
 
 export type Page = {
   id: string;
@@ -60,7 +100,7 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "templates" | "text" | "shapes" | "uploads" | "color" | "size";
+type Tool = "templates" | "text" | "shapes" | "uploads" | "color" | "size" | "icons" | "3d";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 
@@ -155,6 +195,39 @@ export const newImage = (src: string, overrides: Partial<ImageElement> = {}): Im
   height: 480,
   rotation: 0,
   src,
+  ...overrides,
+});
+
+export const newIcon = (name: string, overrides: Partial<IconElement> = {}): IconElement => ({
+  id: uid(),
+  type: "icon",
+  x: 240,
+  y: 240,
+  width: 240,
+  height: 240,
+  rotation: 0,
+  name,
+  color: "#0a0f1f",
+  strokeWidth: 2,
+  ...overrides,
+});
+
+export const newModel3D = (
+  shape: Model3DKind,
+  overrides: Partial<Model3DElement> = {},
+): Model3DElement => ({
+  id: uid(),
+  type: "model3d",
+  x: 240,
+  y: 240,
+  width: 320,
+  height: 320,
+  rotation: 0,
+  shape,
+  color: "#4d7cff",
+  spinSpeed: 8,
+  tiltX: -20,
+  tiltY: 25,
   ...overrides,
 });
 

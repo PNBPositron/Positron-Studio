@@ -1,6 +1,14 @@
 import { useRef, useState, useEffect } from "react";
-import { useEditor, type AnyElement } from "@/store/editor";
+import { useEditor, type AnyElement, DEFAULT_FILTERS, type ImageFilters } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
+import { Model3DRender } from "./Model3DRender";
+import * as LucideIcons from "lucide-react";
+import { HelpCircle } from "lucide-react";
+
+const filterCss = (f?: ImageFilters) => {
+  const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
+  return `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturate}%) blur(${v.blur}px) grayscale(${v.grayscale}%) sepia(${v.sepia}%) hue-rotate(${v.hueRotate}deg) invert(${v.invert}%)`;
+};
 
 type Handle = "nw" | "ne" | "sw" | "se";
 
@@ -140,9 +148,28 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
           src={element.src}
           alt=""
           draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            filter: filterCss(element.filters),
+          }}
         />
       )}
+      {element.type === "icon" && (() => {
+        const Comp =
+          (LucideIcons as unknown as Record<string, React.ComponentType<LucideIcons.LucideProps>>)[element.name] ??
+          HelpCircle;
+        return (
+          <Comp
+            color={element.color}
+            strokeWidth={element.strokeWidth}
+            style={{ width: "100%", height: "100%", display: "block" }}
+          />
+        );
+      })()}
+      {element.type === "model3d" && <Model3DRender element={element} />}
 
       {selected && !editing && (
         <>

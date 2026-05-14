@@ -160,3 +160,8 @@
     width: 100%;
   }
 }
+
+@keyframes positron-spin3d {
+  from { transform: rotateX(var(--tx, -20deg)) rotateY(0deg); }
+  to { transform: rotateX(var(--tx, -20deg)) rotateY(360deg); }
+}

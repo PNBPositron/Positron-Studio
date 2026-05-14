@@ -1,5 +1,5 @@
-import { useEditor } from "@/store/editor";
-import { Copy, Trash2, ArrowUp, ArrowDown, Layers } from "lucide-react";
+import { useEditor, DEFAULT_FILTERS, type ImageFilters } from "@/store/editor";
+import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw } from "lucide-react";
 
 const SWATCHES = [
   "#7df9ff", "#00d9ff", "#0ea5e9", "#4d7cff", "#1f3fb8",
@@ -137,10 +137,140 @@ export function PropertiesPanel() {
                 onChange={(e) => update(el.id, { strokeWidth: +e.target.value })}
                 className="w-full accent-teal"
               />
-              <div className="font-mono text-[11px] text-teal/70">{el.strokeWidth}px</div>
             </Field>
           </>
         )}
+
+        {el.type === "icon" && (
+          <>
+            <Field label="Icon name">
+              <input
+                value={el.name}
+                onChange={(e) => update(el.id, { name: e.target.value })}
+                className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
+              />
+              <div className="font-mono text-[10px] text-teal/50">&gt; lucide PascalCase, e.g. Sparkles</div>
+            </Field>
+            <Field label="Color">
+              <ColorRow value={el.color} onChange={(c) => update(el.id, { color: c })} />
+            </Field>
+            <Field label="Stroke">
+              <input
+                type="range"
+                min={0.5}
+                max={4}
+                step={0.25}
+                value={el.strokeWidth}
+                onChange={(e) => update(el.id, { strokeWidth: +e.target.value })}
+                className="w-full accent-teal"
+              />
+              <div className="font-mono text-[11px] text-teal/70">{el.strokeWidth}</div>
+            </Field>
+          </>
+        )}
+
+        {el.type === "model3d" && (
+          <>
+            <Field label="Shape">
+              <div className="grid grid-cols-2 gap-1">
+                {(["cube", "pyramid", "sphere", "torus"] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => update(el.id, { shape: s })}
+                    className={`brutal-border-2 py-1.5 font-mono text-[10px] uppercase ${
+                      el.shape === s ? "bg-blue text-ink border-teal" : "bg-surface text-teal hover:border-teal"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Color">
+              <ColorRow value={el.color} onChange={(c) => update(el.id, { color: c })} />
+            </Field>
+            <Field label="Spin (s/rev, 0=off)">
+              <input
+                type="range"
+                min={0}
+                max={30}
+                step={0.5}
+                value={el.spinSpeed}
+                onChange={(e) => update(el.id, { spinSpeed: +e.target.value })}
+                className="w-full accent-teal"
+              />
+              <div className="font-mono text-[11px] text-teal/70">{el.spinSpeed}s</div>
+            </Field>
+            <Field label="Tilt X">
+              <input
+                type="range"
+                min={-90}
+                max={90}
+                value={el.tiltX}
+                onChange={(e) => update(el.id, { tiltX: +e.target.value })}
+                className="w-full accent-teal"
+              />
+              <div className="font-mono text-[11px] text-teal/70">{el.tiltX}°</div>
+            </Field>
+            <Field label="Tilt Y">
+              <input
+                type="range"
+                min={-180}
+                max={180}
+                value={el.tiltY}
+                onChange={(e) => update(el.id, { tiltY: +e.target.value })}
+                className="w-full accent-teal"
+              />
+              <div className="font-mono text-[11px] text-teal/70">{el.tiltY}°</div>
+            </Field>
+          </>
+        )}
+
+        {el.type === "image" && (() => {
+          const f: ImageFilters = { ...DEFAULT_FILTERS, ...(el.filters ?? {}) };
+          const set = (patch: Partial<ImageFilters>) =>
+            update(el.id, { filters: { ...f, ...patch } });
+          const FX: Array<[keyof ImageFilters, string, number, number, number, string]> = [
+            ["brightness", "Brightness", 0, 200, 1, "%"],
+            ["contrast", "Contrast", 0, 200, 1, "%"],
+            ["saturate", "Saturation", 0, 200, 1, "%"],
+            ["blur", "Blur", 0, 30, 0.5, "px"],
+            ["grayscale", "Grayscale", 0, 100, 1, "%"],
+            ["sepia", "Sepia", 0, 100, 1, "%"],
+            ["hueRotate", "Hue", -180, 180, 1, "°"],
+            ["invert", "Invert", 0, 100, 1, "%"],
+          ];
+          return (
+            <>
+              <div className="font-display text-[10px] uppercase tracking-[0.25em] text-teal/80">
+                ▸ Image effects
+              </div>
+              {FX.map(([key, label, min, max, step, unit]) => (
+                <Field key={key} label={label}>
+                  <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={f[key]}
+                    onChange={(e) => set({ [key]: +e.target.value } as Partial<ImageFilters>)}
+                    className="w-full accent-teal"
+                  />
+                  <div className="font-mono text-[11px] text-teal/70">
+                    {f[key]}{unit}
+                  </div>
+                </Field>
+              ))}
+              <button
+                onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
+                className="brutal-border-2 brutal-press flex w-full items-center justify-center gap-1 bg-surface py-2 font-mono text-[10px] uppercase tracking-wider text-teal hover:border-teal"
+              >
+                <RotateCcw className="h-3 w-3" strokeWidth={3} /> Reset effects
+              </button>
+            </>
+          );
+        })()}
+
 
         <Field label="Rotation">
           <input
