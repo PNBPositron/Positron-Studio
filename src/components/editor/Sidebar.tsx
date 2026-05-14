@@ -51,6 +51,8 @@ export function Sidebar() {
         {tool === "templates" && <TemplatesPanel />}
         {tool === "text" && <TextPanel />}
         {tool === "shapes" && <ShapesPanel />}
+        {tool === "icons" && <IconsPanel />}
+        {tool === "3d" && <ThreeDPanel />}
         {tool === "uploads" && <UploadsPanel />}
         {tool === "color" && <ColorPanel />}
         {tool === "size" && <SizePanel />}
