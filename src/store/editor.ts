@@ -32,12 +32,52 @@ export type ShapeElement = ElementBase & {
   strokeWidth: number;
 };
 
+export type ImageFilters = {
+  brightness: number; // %
+  contrast: number; // %
+  saturate: number; // %
+  blur: number; // px
+  grayscale: number; // %
+  sepia: number; // %
+  hueRotate: number; // deg
+  invert: number; // %
+};
+
+export const DEFAULT_FILTERS: ImageFilters = {
+  brightness: 100,
+  contrast: 100,
+  saturate: 100,
+  blur: 0,
+  grayscale: 0,
+  sepia: 0,
+  hueRotate: 0,
+  invert: 0,
+};
+
 export type ImageElement = ElementBase & {
   type: "image";
   src: string;
+  filters?: ImageFilters;
 };
 
-export type AnyElement = TextElement | ShapeElement | ImageElement;
+export type IconElement = ElementBase & {
+  type: "icon";
+  name: string; // lucide icon name in PascalCase
+  color: string;
+  strokeWidth: number;
+};
+
+export type Model3DKind = "cube" | "pyramid" | "sphere" | "torus";
+export type Model3DElement = ElementBase & {
+  type: "model3d";
+  shape: Model3DKind;
+  color: string;
+  spinSpeed: number; // seconds per full revolution; 0 = static
+  tiltX: number; // deg
+  tiltY: number; // deg
+};
+
+export type AnyElement = TextElement | ShapeElement | ImageElement | IconElement | Model3DElement;
 
 export type Page = {
   id: string;
