@@ -1,16 +1,20 @@
 import { useEditor } from "@/store/editor";
-import { LayoutTemplate, Type, Shapes, Upload, Palette, Maximize2 } from "lucide-react";
+import { LayoutTemplate, Type, Shapes, Upload, Palette, Maximize2, Sparkles, Box } from "lucide-react";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
 import { ShapesPanel } from "./panels/ShapesPanel";
 import { UploadsPanel } from "./panels/UploadsPanel";
 import { ColorPanel } from "./panels/ColorPanel";
 import { SizePanel } from "./panels/SizePanel";
+import { IconsPanel } from "./panels/IconsPanel";
+import { ThreeDPanel } from "./panels/ThreeDPanel";
 
 const TOOLS = [
   { id: "templates", label: "Templates", icon: LayoutTemplate },
   { id: "text", label: "Text", icon: Type },
   { id: "shapes", label: "Shapes", icon: Shapes },
+  { id: "icons", label: "Icons", icon: Sparkles },
+  { id: "3d", label: "3D", icon: Box },
   { id: "uploads", label: "Uploads", icon: Upload },
   { id: "color", label: "Color", icon: Palette },
   { id: "size", label: "Size", icon: Maximize2 },
