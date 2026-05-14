@@ -82,33 +82,56 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
         outlineOffset: "2px",
       }}
     >
-      {element.type === "text" && (
-        <div
-          contentEditable={editing}
-          suppressContentEditableWarning
-          onBlur={(e) => {
-            update(element.id, { text: e.currentTarget.textContent || "" });
-            setEditing(false);
-          }}
-          style={{
-            width: "100%",
-            height: "100%",
-            fontSize: element.fontSize,
-            color: element.color,
-            fontWeight: element.fontWeight,
-            fontFamily: element.fontFamily,
-            textAlign: element.align,
-            fontStyle: element.italic ? "italic" : "normal",
-            textDecoration: element.underline ? "underline" : "none",
-            outline: "none",
-            lineHeight: 1.05,
-            letterSpacing: "-0.02em",
-            wordBreak: "break-word",
-          }}
-        >
-          {element.text}
-        </div>
-      )}
+      {element.type === "text" && (() => {
+        const presenting = useEditor.getState().presenting;
+        const display = element.bullet && !editing
+          ? (element.text || "").split("\n").map((l) => (l.trim() ? `• ${l}` : l)).join("\n")
+          : element.text;
+        const isLink = !!element.href && presenting && !editing;
+        const textStyle: React.CSSProperties = {
+          width: "100%",
+          height: "100%",
+          fontSize: element.fontSize,
+          color: element.color,
+          fontWeight: element.fontWeight,
+          fontFamily: element.fontFamily,
+          textAlign: element.align,
+          fontStyle: element.italic ? "italic" : "normal",
+          textDecoration: element.underline || isLink ? "underline" : "none",
+          outline: "none",
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          wordBreak: "break-word",
+          whiteSpace: "pre-wrap",
+        };
+        const inner = (
+          <div
+            contentEditable={editing}
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              update(element.id, { text: e.currentTarget.innerText || "" });
+              setEditing(false);
+            }}
+            style={textStyle}
+          >
+            {display}
+          </div>
+        );
+        if (isLink) {
+          return (
+            <a
+              href={element.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseDown={(e) => e.stopPropagation()}
+              style={{ display: "block", width: "100%", height: "100%", color: "inherit" }}
+            >
+              {inner}
+            </a>
+          );
+        }
+        return inner;
+      })()}
       {element.type === "shape" && (
         <ShapeRender element={element} />
       )}
