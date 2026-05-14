@@ -198,6 +198,39 @@ export const newImage = (src: string, overrides: Partial<ImageElement> = {}): Im
   ...overrides,
 });
 
+export const newIcon = (name: string, overrides: Partial<IconElement> = {}): IconElement => ({
+  id: uid(),
+  type: "icon",
+  x: 240,
+  y: 240,
+  width: 240,
+  height: 240,
+  rotation: 0,
+  name,
+  color: "#0a0f1f",
+  strokeWidth: 2,
+  ...overrides,
+});
+
+export const newModel3D = (
+  shape: Model3DKind,
+  overrides: Partial<Model3DElement> = {},
+): Model3DElement => ({
+  id: uid(),
+  type: "model3d",
+  x: 240,
+  y: 240,
+  width: 320,
+  height: 320,
+  rotation: 0,
+  shape,
+  color: "#4d7cff",
+  spinSpeed: 8,
+  tiltX: -20,
+  tiltY: 25,
+  ...overrides,
+});
+
 const newPage = (overrides: Partial<Page> = {}): Page => ({
   id: uid(),
   elements: [],
