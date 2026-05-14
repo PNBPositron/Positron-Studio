@@ -1,5 +1,5 @@
-import { useEditor } from "@/store/editor";
-import { Copy, Trash2, ArrowUp, ArrowDown, Layers } from "lucide-react";
+import { useEditor, DEFAULT_FILTERS, type ImageFilters } from "@/store/editor";
+import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw } from "lucide-react";
 
 const SWATCHES = [
   "#7df9ff", "#00d9ff", "#0ea5e9", "#4d7cff", "#1f3fb8",
