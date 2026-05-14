@@ -1,6 +1,14 @@
 import { useRef, useState, useEffect } from "react";
-import { useEditor, type AnyElement } from "@/store/editor";
+import { useEditor, type AnyElement, DEFAULT_FILTERS, type ImageFilters } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
+import { Model3DRender } from "./Model3DRender";
+import * as LucideIcons from "lucide-react";
+import { HelpCircle } from "lucide-react";
+
+const filterCss = (f?: ImageFilters) => {
+  const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
+  return `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturate}%) blur(${v.blur}px) grayscale(${v.grayscale}%) sepia(${v.sepia}%) hue-rotate(${v.hueRotate}deg) invert(${v.invert}%)`;
+};
 
 type Handle = "nw" | "ne" | "sw" | "se";
 
