@@ -21,6 +21,10 @@ const CURATED = [
 
 const NAMES = Array.from(new Set(CURATED.map((n) => n.split(" as ")[0])));
 
+const ALL_NAMES = Object.keys(LucideIcons).filter(
+  (k) => /^[A-Z]/.test(k) && !["Icon", "createLucideIcon", "default"].includes(k),
+);
+
 export function IconsPanel() {
   const { add } = useEditor();
   const [q, setQ] = useState("");
@@ -28,7 +32,7 @@ export function IconsPanel() {
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     if (!term) return NAMES;
-    return NAMES.filter((n) => n.toLowerCase().includes(term));
+    return ALL_NAMES.filter((n) => n.toLowerCase().includes(term));
   }, [q]);
 
   return (
