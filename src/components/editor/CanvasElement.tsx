@@ -18,8 +18,11 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
 
+  const linkActive = element.type === "text" && !!element.href && !selected && !editing;
+
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
+    if (linkActive) return; // let the <a> handle the click
     e.stopPropagation();
     select(element.id);
     const startX = e.clientX;
