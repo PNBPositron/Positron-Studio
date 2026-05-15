@@ -22,7 +22,7 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
 
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
-    if (linkActive) return; // let the <a> handle the click
+    if (linkActive && !e.shiftKey) return; // let the <a> handle the click; shift+click selects
     e.stopPropagation();
     select(element.id);
     const startX = e.clientX;
