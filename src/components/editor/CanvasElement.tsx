@@ -18,8 +18,11 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
 
+  const linkActive = element.type === "text" && !!element.href && !selected && !editing;
+
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
+    if (linkActive && !e.shiftKey) return; // let the <a> handle the click; shift+click selects
     e.stopPropagation();
     select(element.id);
     const startX = e.clientX;
@@ -95,7 +98,7 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
         const display = element.bullet && !editing
           ? (element.text || "").split("\n").map((l) => (l.trim() ? `• ${l}` : l)).join("\n")
           : element.text;
-        const isLink = !!element.href && presenting && !editing;
+        const isLink = !!element.href && !editing && (presenting || !selected);
         const textStyle: React.CSSProperties = {
           width: "100%",
           height: "100%",
