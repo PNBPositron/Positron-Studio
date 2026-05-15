@@ -98,7 +98,7 @@ export function CanvasElement({ element, scale }: { element: AnyElement; scale: 
         const display = element.bullet && !editing
           ? (element.text || "").split("\n").map((l) => (l.trim() ? `• ${l}` : l)).join("\n")
           : element.text;
-        const isLink = !!element.href && presenting && !editing;
+        const isLink = !!element.href && !editing && (presenting || !selected);
         const textStyle: React.CSSProperties = {
           width: "100%",
           height: "100%",
