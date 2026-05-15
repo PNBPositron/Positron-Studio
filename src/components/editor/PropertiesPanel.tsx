@@ -115,7 +115,7 @@ export function PropertiesPanel() {
                 onChange={(e) => update(el.id, { href: e.target.value })}
                 className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
               />
-              <div className="font-mono text-[10px] text-teal/50">&gt; active in presentation/export</div>
+              <div className="font-mono text-[10px] text-teal/50">&gt; click opens link · shift+click to select</div>
             </Field>
           </>
         )}
